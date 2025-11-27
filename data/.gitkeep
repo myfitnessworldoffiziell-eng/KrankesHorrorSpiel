@@ -1,0 +1,5 @@
+# Data Folder
+
+Hier werden Spieldaten gespeichert:
+- save.json (Player progress, persistent data)
+- secrets.dat (Hidden codes, ARG elements)
