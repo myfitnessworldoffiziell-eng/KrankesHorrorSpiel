@@ -1,0 +1,167 @@
+#include "AudioManager.h"
+#include <iostream>
+
+AudioManager::AudioManager()
+    : m_musicVolume(64)
+    , m_initialized(false)
+    , m_distortionLevel(0.0f)
+{
+}
+
+AudioManager::~AudioManager() {
+    shutdown();
+}
+
+bool AudioManager::initialize() {
+    std::cout << "[AudioManager] Initializing..." << std::endl;
+
+    // Mix_OpenAudio should already be called in Game.cpp
+    // Here we just set default volumes
+    Mix_VolumeMusic(m_musicVolume);
+
+    m_initialized = true;
+    std::cout << "[AudioManager] Initialized successfully" << std::endl;
+    return true;
+}
+
+void AudioManager::shutdown() {
+    if (!m_initialized) return;
+
+    std::cout << "[AudioManager] Shutting down..." << std::endl;
+
+    // Stop all audio
+    Mix_HaltMusic();
+    Mix_HaltChannel(-1);
+
+    // Free music
+    for (auto& pair : m_music) {
+        if (pair.second) {
+            Mix_FreeMusic(pair.second);
+        }
+    }
+    m_music.clear();
+
+    // Free sounds
+    for (auto& pair : m_sounds) {
+        if (pair.second) {
+            Mix_FreeChunk(pair.second);
+        }
+    }
+    m_sounds.clear();
+
+    m_initialized = false;
+}
+
+bool AudioManager::loadMusic(const std::string& id, const std::string& filepath) {
+    Mix_Music* music = Mix_LoadMUS(filepath.c_str());
+    if (!music) {
+        std::cerr << "[AudioManager] Failed to load music '" << id << "': " << Mix_GetError() << std::endl;
+        return false;
+    }
+
+    // Free existing if present
+    auto it = m_music.find(id);
+    if (it != m_music.end() && it->second) {
+        Mix_FreeMusic(it->second);
+    }
+
+    m_music[id] = music;
+    std::cout << "[AudioManager] Loaded music: " << id << std::endl;
+    return true;
+}
+
+void AudioManager::playMusic(const std::string& id, int loops) {
+    auto it = m_music.find(id);
+    if (it == m_music.end() || !it->second) {
+        std::cerr << "[AudioManager] Music not found: " << id << std::endl;
+        return;
+    }
+
+    if (Mix_PlayMusic(it->second, loops) == -1) {
+        std::cerr << "[AudioManager] Failed to play music: " << Mix_GetError() << std::endl;
+        return;
+    }
+
+    m_currentMusicId = id;
+    std::cout << "[AudioManager] Playing music: " << id << std::endl;
+}
+
+void AudioManager::stopMusic() {
+    Mix_HaltMusic();
+    m_currentMusicId.clear();
+}
+
+void AudioManager::pauseMusic() {
+    Mix_PauseMusic();
+}
+
+void AudioManager::resumeMusic() {
+    Mix_ResumeMusic();
+}
+
+void AudioManager::setMusicVolume(int volume) {
+    m_musicVolume = volume;
+    Mix_VolumeMusic(m_musicVolume);
+}
+
+bool AudioManager::loadSound(const std::string& id, const std::string& filepath) {
+    Mix_Chunk* sound = Mix_LoadWAV(filepath.c_str());
+    if (!sound) {
+        std::cerr << "[AudioManager] Failed to load sound '" << id << "': " << Mix_GetError() << std::endl;
+        return false;
+    }
+
+    // Free existing if present
+    auto it = m_sounds.find(id);
+    if (it != m_sounds.end() && it->second) {
+        Mix_FreeChunk(it->second);
+    }
+
+    m_sounds[id] = sound;
+    std::cout << "[AudioManager] Loaded sound: " << id << std::endl;
+    return true;
+}
+
+void AudioManager::playSound(const std::string& id, int volume) {
+    auto it = m_sounds.find(id);
+    if (it == m_sounds.end() || !it->second) {
+        std::cerr << "[AudioManager] Sound not found: " << id << std::endl;
+        return;
+    }
+
+    Mix_VolumeChunk(it->second, volume);
+    Mix_PlayChannel(-1, it->second, 0);
+}
+
+void AudioManager::distortMusic(float amount) {
+    m_distortionLevel = amount;
+
+    // Simulate distortion durch Volume-Manipulation
+    // (echte Distortion würde DSP benötigen)
+    int baseVolume = 64;
+    int distortedVolume = static_cast<int>(baseVolume * (1.0f - amount * 0.5f));
+    Mix_VolumeMusic(distortedVolume);
+}
+
+void AudioManager::playJumpscare() {
+    // Jumpscare sound (wenn geladen)
+    playSound("jumpscare", 128);
+}
+
+void AudioManager::playWhiteNoise(int duration_ms) {
+    // White noise (wenn geladen)
+    playSound("whitenoise");
+
+    // TODO: Stop nach duration_ms
+    (void)duration_ms;
+}
+
+void AudioManager::update(float deltaTime, int corruptionLevel) {
+    (void)deltaTime;
+
+    // Progressive Musik-Distortion basierend auf corruption
+    if (corruptionLevel > 30) {
+        float distortion = (corruptionLevel - 30) / 70.0f; // 0.0 - 1.0
+        distortMusic(distortion);
+    }
+}

@@ -4,20 +4,28 @@
 #include "CorruptionSystem.h"
 #include "Player.h"
 #include "Level.h"
+#include "AudioManager.h"
+#include "UIHelper.h"
+#include "MainMenu.h"
+#include "PauseMenu.h"
+#include "DialogSystem.h"
+#include "FakeBlueScreen.h"
+#include "JumpscareSystem.h"
 #include <iostream>
 #include <cmath>
 
 Game::Game()
     : m_window(nullptr)
     , m_renderer(nullptr)
+    , m_currentState(GameState::MAIN_MENU)
     , m_isRunning(false)
     , m_isFullscreen(false)
     , m_windowPosX(SDL_WINDOWPOS_CENTERED)
     , m_windowPosY(SDL_WINDOWPOS_CENTERED)
     , m_lastFrameTime(0)
     , m_gameTime(0.0f)
+    , m_totalTime(0.0f)
     , m_corruptionLevel(0)
-    , m_glitchActive(false)
 {
 }
 
@@ -26,7 +34,9 @@ Game::~Game() {
 }
 
 bool Game::initialize() {
-    std::cout << "Initializing ECHOES.exe..." << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "  Initializing ECHOES.exe" << std::endl;
+    std::cout << "========================================" << std::endl;
 
     // SDL initialisieren
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
@@ -73,24 +83,49 @@ bool Game::initialize() {
         return false;
     }
 
+    // UI Helper initialisieren
+    UIHelper::init();
+
     // Subsysteme initialisieren
+    std::cout << "Initializing subsystems..." << std::endl;
+
     m_metaHorror = std::make_unique<MetaHorror>();
     m_permissionManager = std::make_unique<PermissionManager>();
     m_corruptionSystem = std::make_unique<CorruptionSystem>(m_renderer);
+    m_audioManager = std::make_unique<AudioManager>();
     m_player = std::make_unique<Player>();
     m_level = std::make_unique<Level>();
+    m_mainMenu = std::make_unique<MainMenu>();
+    m_pauseMenu = std::make_unique<PauseMenu>();
+    m_dialogSystem = std::make_unique<DialogSystem>();
+    m_fakeBlueScreen = std::make_unique<FakeBlueScreen>();
+    m_jumpscareSystem = std::make_unique<JumpscareSystem>(m_audioManager.get());
 
     // Meta-Horror initialisieren (erstellt erste Dateien)
     m_metaHorror->initialize();
 
+    // Audio Manager initialisieren
+    m_audioManager->initialize();
+
+    // Audio-Dateien laden (optional - wenn vorhanden)
+    std::cout << "Loading audio files (optional)..." << std::endl;
+    m_audioManager->loadMusic("menu", "assets/audio/menu_music.mp3");
+    m_audioManager->loadMusic("level", "assets/audio/level_music.mp3");
+    m_audioManager->loadMusic("corrupted", "assets/audio/corrupted_music.mp3");
+    m_audioManager->loadSound("jump", "assets/audio/jump.wav");
+    m_audioManager->loadSound("collect", "assets/audio/collect.wav");
+    m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.wav");
+    m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.wav");
+
     m_isRunning = true;
     m_lastFrameTime = SDL_GetTicks();
 
-    std::cout << "Initialisierung abgeschlossen!" << std::endl;
-    std::cout << "==================================" << std::endl;
-    std::cout << "WILLKOMMEN zu ECHOES!" << std::endl;
-    std::cout << "Ein nostalgisches Platformer-Spiel..." << std::endl;
-    std::cout << "==================================" << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "  Initialization complete!" << std::endl;
+    std::cout << "========================================" << std::endl;
+
+    // Start menu music
+    m_audioManager->playMusic("menu");
 
     return true;
 }
@@ -101,13 +136,16 @@ void Game::run() {
         Uint32 currentTime = SDL_GetTicks();
         float deltaTime = (currentTime - m_lastFrameTime) / 1000.0f;
         m_lastFrameTime = currentTime;
-        m_gameTime += deltaTime;
+        m_totalTime += deltaTime;
+
+        // Cap delta time (prevent huge jumps)
+        if (deltaTime > 0.1f) deltaTime = 0.1f;
 
         handleEvents();
         update(deltaTime);
         render();
 
-        // FPS Cap (optional, wenn kein VSync)
+        // FPS Cap (optional)
         SDL_Delay(1);
     }
 }
@@ -115,41 +153,143 @@ void Game::run() {
 void Game::handleEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-            case SDL_QUIT:
-                m_isRunning = false;
+        // Global events
+        if (event.type == SDL_QUIT) {
+            m_isRunning = false;
+            return;
+        }
+
+        // State-specific input handling
+        switch (m_currentState) {
+            case GameState::MAIN_MENU:
+                m_mainMenu->handleInput(event);
                 break;
 
-            case SDL_KEYDOWN:
-                switch (event.key.keysym.sym) {
-                    case SDLK_ESCAPE:
-                        m_isRunning = false;
-                        break;
-                    case SDLK_F11:
-                        // Fullscreen Toggle
-                        m_isFullscreen = !m_isFullscreen;
-                        SDL_SetWindowFullscreen(m_window, m_isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-                        break;
-                    case SDLK_g:
-                        // Debug: Trigger Glitch
-                        triggerGlitch();
-                        break;
-                    case SDLK_f:
-                        // Debug: Create Files
-                        triggerFileCreation();
-                        break;
-                    case SDLK_w:
-                        // Debug: Window Manipulation
-                        triggerWindowManipulation();
-                        break;
+            case GameState::PLAYING:
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+                    setState(GameState::PAUSED);
                 }
+                // Debug keys
+                if (event.type == SDL_KEYDOWN) {
+                    switch (event.key.keysym.sym) {
+                        case SDLK_g: triggerGlitch(); break;
+                        case SDLK_f: triggerFileCreation(); break;
+                        case SDLK_w: triggerWindowManipulation(); break;
+                        case SDLK_j: triggerJumpscare(); break;
+                        case SDLK_b: triggerFakeBSOD(); break;
+                        case SDLK_F11:
+                            m_isFullscreen = !m_isFullscreen;
+                            SDL_SetWindowFullscreen(m_window, m_isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+                            break;
+                    }
+                }
+                break;
+
+            case GameState::PAUSED:
+                m_pauseMenu->handleInput(event);
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+                    setState(GameState::PLAYING);
+                }
+                break;
+
+            case GameState::DIALOG:
+                m_dialogSystem->handleInput(event);
+                break;
+
+            case GameState::FAKE_CRASH:
+                // Allow skip with any key
+                if (event.type == SDL_KEYDOWN) {
+                    m_fakeBlueScreen->skip();
+                }
+                break;
+
+            default:
                 break;
         }
     }
 }
 
 void Game::update(float deltaTime) {
-    // Corruption Level steigt langsam mit Zeit (horror steigert sich)
+    // Update audio system (global)
+    m_audioManager->update(deltaTime, m_corruptionLevel);
+
+    // State-specific updates
+    switch (m_currentState) {
+        case GameState::MAIN_MENU:
+            updateMainMenu(deltaTime);
+            break;
+        case GameState::PLAYING:
+            updatePlaying(deltaTime);
+            break;
+        case GameState::PAUSED:
+            updatePaused(deltaTime);
+            break;
+        case GameState::DIALOG:
+            updateDialog(deltaTime);
+            break;
+        case GameState::FAKE_CRASH:
+            updateFakeCrash(deltaTime);
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::render() {
+    // Clear
+    SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
+    SDL_RenderClear(m_renderer);
+
+    // State-specific rendering
+    switch (m_currentState) {
+        case GameState::MAIN_MENU:
+            renderMainMenu();
+            break;
+        case GameState::PLAYING:
+            renderPlaying();
+            break;
+        case GameState::PAUSED:
+            renderPlaying(); // Render game in background
+            renderPaused();  // Then overlay pause menu
+            break;
+        case GameState::DIALOG:
+            renderPlaying(); // Render game in background
+            renderDialog();  // Then overlay dialog
+            break;
+        case GameState::FAKE_CRASH:
+            renderFakeCrash();
+            break;
+        default:
+            break;
+    }
+
+    // Present
+    SDL_RenderPresent(m_renderer);
+}
+
+void Game::updateMainMenu(float deltaTime) {
+    auto result = m_mainMenu->update(deltaTime);
+
+    switch (result) {
+        case MainMenu::MenuResult::START_GAME:
+            setState(GameState::PLAYING);
+            break;
+        case MainMenu::MenuResult::SETTINGS:
+            // TODO: Settings menu
+            std::cout << "[Game] Settings not implemented yet" << std::endl;
+            break;
+        case MainMenu::MenuResult::QUIT:
+            m_isRunning = false;
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::updatePlaying(float deltaTime) {
+    m_gameTime += deltaTime;
+
+    // Corruption Level steigt langsam mit Zeit
     m_corruptionLevel = static_cast<int>(std::min(100.0f, m_gameTime / 2.0f)); // 200 Sekunden bis max
 
     // Corruption System Update
@@ -161,39 +301,168 @@ void Game::update(float deltaTime) {
     // Level Update
     m_level->update(deltaTime);
 
-    // Meta-Horror Events (random, basierend auf corruption level)
+    // Meta-Horror Events
     m_metaHorror->update(deltaTime, m_corruptionLevel);
 
-    // Nach 30 Sekunden: Erste Kamera-Permission-Anfrage
-    if (m_gameTime > 30.0f && !m_permissionManager->hasCameraPermission()) {
-        static bool askedOnce = false;
-        if (!askedOnce) {
+    // Jumpscare System
+    m_jumpscareSystem->update(deltaTime, m_corruptionLevel);
+
+    // Nach 30 Sekunden: Erste creepy Dialog-Sequenz
+    static bool firstDialogShown = false;
+    if (m_gameTime > 30.0f && !firstDialogShown && !m_dialogSystem->isActive()) {
+        m_dialogSystem->addDialog("", "Something feels... off.", 3.0f);
+        m_dialogSystem->addDialog("Echo", "Welcome, player.", 2.0f);
+        m_dialogSystem->addDialog("Echo", "I've been waiting for you...", 0.0f);
+        m_dialogSystem->start();
+        setState(GameState::DIALOG);
+        firstDialogShown = true;
+    }
+
+    // Nach 60 Sekunden: Kamera-Permission
+    static bool cameraRequested = false;
+    if (m_gameTime > 60.0f && !cameraRequested) {
+        if (!m_permissionManager->hasCameraPermission()) {
             m_permissionManager->requestCameraPermission();
-            askedOnce = true;
+            cameraRequested = true;
         }
+    }
+
+    // Nach 120 Sekunden: Fake BSOD
+    static bool bsodShown = false;
+    if (m_gameTime > 120.0f && !bsodShown) {
+        triggerFakeBSOD();
+        bsodShown = true;
     }
 }
 
-void Game::render() {
-    // Clear screen
-    SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
-    SDL_RenderClear(m_renderer);
+void Game::updatePaused(float deltaTime) {
+    auto result = m_pauseMenu->update(deltaTime);
 
-    // Render Level
+    switch (result) {
+        case PauseMenu::PauseResult::RESUME:
+            setState(GameState::PLAYING);
+            break;
+        case PauseMenu::PauseResult::MAIN_MENU:
+            setState(GameState::MAIN_MENU);
+            break;
+        case PauseMenu::PauseResult::QUIT:
+            m_isRunning = false;
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::updateDialog(float deltaTime) {
+    m_dialogSystem->update(deltaTime);
+
+    // Return to PLAYING when dialog finished
+    if (!m_dialogSystem->isActive()) {
+        setState(GameState::PLAYING);
+    }
+}
+
+void Game::updateFakeCrash(float deltaTime) {
+    m_fakeBlueScreen->update(deltaTime);
+
+    // Return to PLAYING when BSOD finished
+    if (!m_fakeBlueScreen->isActive()) {
+        setState(GameState::PLAYING);
+    }
+}
+
+void Game::renderMainMenu() {
+    m_mainMenu->render(m_renderer);
+}
+
+void Game::renderPlaying() {
+    // Level
     m_level->render(m_renderer);
 
-    // Render Player
+    // Player
     m_player->render(m_renderer);
 
     // Corruption Effects (Overlay)
     m_corruptionSystem->render(m_renderer, m_corruptionLevel);
 
-    // Present
-    SDL_RenderPresent(m_renderer);
+    // Jumpscare (if active)
+    m_jumpscareSystem->render(m_renderer);
+}
+
+void Game::renderPaused() {
+    m_pauseMenu->render(m_renderer);
+}
+
+void Game::renderDialog() {
+    m_dialogSystem->render(m_renderer);
+}
+
+void Game::renderFakeCrash() {
+    m_fakeBlueScreen->render(m_renderer);
+}
+
+void Game::setState(GameState newState) {
+    if (m_currentState == newState) return;
+
+    std::cout << "[Game] State transition: ";
+    switch (m_currentState) {
+        case GameState::MAIN_MENU: std::cout << "MAIN_MENU"; break;
+        case GameState::PLAYING: std::cout << "PLAYING"; break;
+        case GameState::PAUSED: std::cout << "PAUSED"; break;
+        case GameState::DIALOG: std::cout << "DIALOG"; break;
+        case GameState::FAKE_CRASH: std::cout << "FAKE_CRASH"; break;
+        default: std::cout << "UNKNOWN"; break;
+    }
+    std::cout << " -> ";
+    switch (newState) {
+        case GameState::MAIN_MENU: std::cout << "MAIN_MENU"; break;
+        case GameState::PLAYING: std::cout << "PLAYING"; break;
+        case GameState::PAUSED: std::cout << "PAUSED"; break;
+        case GameState::DIALOG: std::cout << "DIALOG"; break;
+        case GameState::FAKE_CRASH: std::cout << "FAKE_CRASH"; break;
+        default: std::cout << "UNKNOWN"; break;
+    }
+    std::cout << std::endl;
+
+    GameState oldState = m_currentState;
+    m_currentState = newState;
+
+    // State entry actions
+    switch (newState) {
+        case GameState::MAIN_MENU:
+            m_audioManager->playMusic("menu");
+            m_gameTime = 0.0f; // Reset game time
+            break;
+
+        case GameState::PLAYING:
+            if (oldState == GameState::MAIN_MENU) {
+                m_audioManager->playMusic("level");
+            } else if (oldState == GameState::PAUSED) {
+                m_audioManager->resumeMusic();
+            }
+            break;
+
+        case GameState::PAUSED:
+            m_audioManager->pauseMusic();
+            break;
+
+        case GameState::DIALOG:
+            // Keep game music playing
+            break;
+
+        case GameState::FAKE_CRASH:
+            m_audioManager->stopMusic();
+            break;
+
+        default:
+            break;
+    }
 }
 
 void Game::shutdown() {
-    std::cout << "Shutting down ECHOES.exe..." << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << "  Shutting down ECHOES.exe" << std::endl;
+    std::cout << "========================================" << std::endl;
 
     // Meta-Horror Cleanup (erstellt letzte Dateien)
     if (m_metaHorror) {
@@ -201,11 +470,20 @@ void Game::shutdown() {
     }
 
     // Subsysteme freigeben
+    m_jumpscareSystem.reset();
+    m_fakeBlueScreen.reset();
+    m_dialogSystem.reset();
+    m_pauseMenu.reset();
+    m_mainMenu.reset();
     m_level.reset();
     m_player.reset();
+    m_audioManager.reset();
     m_corruptionSystem.reset();
     m_permissionManager.reset();
     m_metaHorror.reset();
+
+    // UI Helper shutdown
+    UIHelper::shutdown();
 
     // SDL Cleanup
     if (m_renderer) {
@@ -218,14 +496,17 @@ void Game::shutdown() {
         m_window = nullptr;
     }
 
+    Mix_CloseAudio();
     TTF_Quit();
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
 
     std::cout << "Goodbye..." << std::endl;
+    std::cout << "Or is it?" << std::endl;
 }
 
+// Debug triggers
 void Game::triggerGlitch() {
     std::cout << "[DEBUG] Glitch triggered!" << std::endl;
     m_corruptionSystem->forceGlitch();
@@ -239,4 +520,15 @@ void Game::triggerFileCreation() {
 void Game::triggerWindowManipulation() {
     std::cout << "[DEBUG] Window manipulation..." << std::endl;
     m_metaHorror->manipulateWindow(m_window);
+}
+
+void Game::triggerJumpscare() {
+    std::cout << "[DEBUG] Jumpscare!" << std::endl;
+    m_jumpscareSystem->triggerRandomScare();
+}
+
+void Game::triggerFakeBSOD() {
+    std::cout << "[DEBUG] Fake Blue Screen!" << std::endl;
+    m_fakeBlueScreen->trigger(10.0f); // 10 seconds
+    setState(GameState::FAKE_CRASH);
 }

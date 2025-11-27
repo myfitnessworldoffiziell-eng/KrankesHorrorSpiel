@@ -62,16 +62,18 @@ make
 
 ## ⌨️ Controls
 
+### Gameplay
 - **Arrow Keys / WASD** - Bewegung
-- **SPACE** - Springen
+- **SPACE** - Springen / Dialog fortsetzen
+- **ESC** - Pause / Zur\u00fcck
 - **F11** - Fullscreen Toggle
-- **ESC** - Beenden
 
-### Debug-Keys
-
+### Debug-Keys (während Spielen)
 - **G** - Glitch-Effekt triggern
 - **F** - Creepy Datei erstellen
 - **W** - Fenster manipulieren
+- **J** - Jumpscare triggern
+- **B** - Fake Blue Screen
 
 ## ⚠️ Ethische Grenzen
 
@@ -122,20 +124,38 @@ Was als niedliches Platformer-Game beginnt, entwickelt sich zu einem Meta-Horror
 
 ## 🔧 Development Roadmap
 
+### ✅ Phase 1 - Foundation (FERTIG!)
 - [x] Core Engine Setup
 - [x] Basic Game Loop
 - [x] Meta-Horror File System
 - [x] Permission Manager
 - [x] Visual Corruption Effects
 - [x] Simple Platformer Mechanics
+
+### ✅ Phase 2 - UI & Audio (FERTIG!)
+- [x] Main Menu System
+- [x] Pause Menu
+- [x] Dialog/Textbox System
+- [x] Audio Manager (SDL_mixer)
+- [x] Game State Management
+- [x] Jumpscare System
+- [x] Fake Blue Screen of Death
+
+### 🚧 Phase 3 - Content (In Arbeit)
+- [ ] Audio-Dateien (Free Sounds) - siehe `assets/audio/AUDIO_DOWNLOAD.md`
+- [ ] Erweiterte Level (10 Level)
+- [ ] Story-Sequenzen/Cutscenes
+- [ ] NPC-System
+- [ ] Enemy AI
+- [ ] Boss Fights
+
+### 📋 Phase 4 - Advanced (Geplant)
 - [ ] Kamera-Integration (OpenCV)
 - [ ] Mikrofon-Integration (PortAudio)
-- [ ] Erweiterte Level (10 Level)
-- [ ] Story-Sequenzen
 - [ ] Multiple Endings
 - [ ] Persistent Save System (JSON)
-- [ ] Audio System (Horror-Sounds)
-- [ ] Sprites & Visuals
+- [ ] Sprites & Visuals (Pixel Art)
+- [ ] Particle System
 
 ## 📝 Lizenz
 

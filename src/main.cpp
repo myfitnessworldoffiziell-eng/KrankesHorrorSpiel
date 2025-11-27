@@ -17,23 +17,28 @@ int main(int argc, char* argv[]) {
         std::cout << "  - Optional camera/microphone access" << std::endl;
         std::cout << "  - Window manipulation" << std::endl;
         std::cout << "  - Psychological horror elements" << std::endl;
+        std::cout << "  - Fake system crashes (harmless!)" << std::endl;
+        std::cout << "  - Jumpscares with audio" << std::endl;
         std::cout << std::endl;
         std::cout << "By continuing, you consent to these mechanics." << std::endl;
         std::cout << "You can quit anytime by pressing ESC or closing the window." << std::endl;
         std::cout << std::endl;
-        std::cout << "Controls:" << std::endl;
+        std::cout << "==== CONTROLS ====" << std::endl;
         std::cout << "  Arrow Keys / WASD - Move" << std::endl;
-        std::cout << "  SPACE - Jump" << std::endl;
+        std::cout << "  SPACE - Jump / Continue Dialog" << std::endl;
+        std::cout << "  ESC - Pause / Back" << std::endl;
         std::cout << "  F11 - Fullscreen" << std::endl;
-        std::cout << "  ESC - Quit" << std::endl;
         std::cout << std::endl;
-        std::cout << "Debug Keys:" << std::endl;
-        std::cout << "  G - Trigger Glitch" << std::endl;
-        std::cout << "  F - Create File" << std::endl;
+        std::cout << "==== DEBUG KEYS (while playing) ====" << std::endl;
+        std::cout << "  G - Trigger Glitch Effect" << std::endl;
+        std::cout << "  F - Create Creepy File" << std::endl;
         std::cout << "  W - Window Manipulation" << std::endl;
+        std::cout << "  J - Trigger Jumpscare" << std::endl;
+        std::cout << "  B - Fake Blue Screen" << std::endl;
         std::cout << std::endl;
         std::cout << "Press ENTER to start..." << std::endl;
         std::cin.get();
+        std::cout << std::endl;
 
         // Game erstellen und starten
         Game game;
@@ -49,6 +54,7 @@ int main(int argc, char* argv[]) {
         std::cout << std::endl;
         std::cout << "Thank you for playing ECHOES..." << std::endl;
         std::cout << "Or did you?" << std::endl;
+        std::cout << std::endl;
 
         return 0;
 

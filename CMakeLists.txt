@@ -34,15 +34,30 @@ set(SOURCES
     src/CorruptionSystem.cpp
     src/Player.cpp
     src/Level.cpp
+    src/AudioManager.cpp
+    src/UIHelper.cpp
+    src/MainMenu.cpp
+    src/PauseMenu.cpp
+    src/DialogSystem.cpp
+    src/FakeBlueScreen.cpp
+    src/JumpscareSystem.cpp
 )
 
 set(HEADERS
     src/Game.h
+    src/GameState.h
     src/MetaHorror.h
     src/PermissionManager.h
     src/CorruptionSystem.h
     src/Player.h
     src/Level.h
+    src/AudioManager.h
+    src/UIHelper.h
+    src/MainMenu.h
+    src/PauseMenu.h
+    src/DialogSystem.h
+    src/FakeBlueScreen.h
+    src/JumpscareSystem.h
 )
 
 # Executable
