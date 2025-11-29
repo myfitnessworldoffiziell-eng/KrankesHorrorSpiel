@@ -94,6 +94,7 @@ bool Game::initialize() {
     m_corruptionSystem = std::make_unique<CorruptionSystem>(m_renderer);
     m_audioManager = std::make_unique<AudioManager>();
     m_player = std::make_unique<Player>();
+    m_player->setAudioManager(m_audioManager.get());  // Connect audio to player
     m_level = std::make_unique<Level>();
     m_mainMenu = std::make_unique<MainMenu>();
     m_pauseMenu = std::make_unique<PauseMenu>();
@@ -114,6 +115,7 @@ bool Game::initialize() {
     m_audioManager->loadMusic("corrupted", "assets/audio/corrupted_music.mp3");
     m_audioManager->loadSound("jump", "assets/audio/jump.wav");
     m_audioManager->loadSound("collect", "assets/audio/collect.wav");
+    m_audioManager->loadSound("death", "assets/audio/death.wav");
     m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.wav");
     m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.wav");
 
@@ -301,6 +303,62 @@ void Game::updatePlaying(float deltaTime) {
     // Level Update
     m_level->update(deltaTime);
 
+    // === COLLISION DETECTION ===
+
+    // Player vs Enemies
+    if (m_player->isAlive()) {
+        SDL_Rect playerBounds = m_player->getBounds();
+
+        for (auto& enemy : m_level->getEnemies()) {
+            if (enemy && enemy->isAlive()) {
+                SDL_Rect enemyBounds = enemy->getBounds();
+
+                // Check collision
+                if (SDL_HasIntersection(&playerBounds, &enemyBounds)) {
+                    // Check if player is jumping on enemy
+                    bool jumpedOn = (m_player->getY() + 32 < enemy->getY() + 10);
+
+                    if (jumpedOn && enemy->canBeJumpedOn()) {
+                        // Player defeats enemy by jumping on it
+                        enemy->kill();
+                        m_audioManager->playSound("collect", 100);  // Victory sound
+                        std::cout << "[Game] Enemy defeated!" << std::endl;
+                    } else {
+                        // Enemy damages player
+                        m_player->takeDamage(enemy->getDamage());
+                        std::cout << "[Game] Player hit! Health: " << m_player->getHealth() << std::endl;
+                    }
+                }
+            }
+        }
+
+        // Player vs Stars (collectibles)
+        for (auto& star : m_level->getStars()) {
+            if (!star.collected) {
+                // Simple distance check
+                float dx = m_player->getX() - star.x;
+                float dy = m_player->getY() - star.y;
+                float distance = std::sqrt(dx * dx + dy * dy);
+
+                if (distance < 30.0f) {  // Collection radius
+                    star.collected = true;
+                    m_audioManager->playSound("collect", 120);
+                    std::cout << "[Game] Star collected!" << std::endl;
+                }
+            }
+        }
+    }
+
+    // Check if player died
+    if (!m_player->isAlive()) {
+        std::cout << "[Game] Player died! Respawning..." << std::endl;
+        // TODO: Game over screen or respawn
+        // For now, respawn at start
+        m_player->setPosition(50.0f, 400.0f);
+        m_player->takeDamage(-100);  // Restore health (hack for now)
+        m_level->loadLevel(m_level->getLevelNumber(), m_audioManager.get());  // Reload level
+    }
+
     // Meta-Horror Events
     m_metaHorror->update(deltaTime, m_corruptionLevel);
 
@@ -382,6 +440,53 @@ void Game::renderPlaying() {
     // Player
     m_player->render(m_renderer);
 
+    // === UI OVERLAY ===
+
+    // Health Bar (top left)
+    int healthBarX = 10;
+    int healthBarY = 10;
+    int healthBarWidth = 200;
+    int healthBarHeight = 20;
+
+    // Health bar background (dark)
+    SDL_SetRenderDrawColor(m_renderer, 50, 50, 50, 200);
+    SDL_Rect healthBg = {healthBarX, healthBarY, healthBarWidth, healthBarHeight};
+    SDL_RenderFillRect(m_renderer, &healthBg);
+
+    // Health bar fill (red to green)
+    int healthPercent = (m_player->getHealth() * 100) / m_player->getMaxHealth();
+    int fillWidth = (healthBarWidth * healthPercent) / 100;
+
+    // Color based on health
+    Uint8 r = 255 - (healthPercent * 255 / 100);
+    Uint8 g = (healthPercent * 255 / 100);
+    SDL_SetRenderDrawColor(m_renderer, r, g, 0, 255);
+    SDL_Rect healthFill = {healthBarX, healthBarY, fillWidth, healthBarHeight};
+    SDL_RenderFillRect(m_renderer, &healthFill);
+
+    // Health bar border
+    SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(m_renderer, &healthBg);
+
+    // Health text
+    UIHelper::renderText(m_renderer, "HP: " + std::to_string(m_player->getHealth()),
+                        healthBarX + healthBarWidth + 10, healthBarY, 18, 255, 255, 255);
+
+    // Star Counter (top right)
+    int starsCollected = 0;
+    int totalStars = 0;
+    for (const auto& star : m_level->getStars()) {
+        totalStars++;
+        if (star.collected) starsCollected++;
+    }
+
+    std::string starText = "⭐ " + std::to_string(starsCollected) + "/" + std::to_string(totalStars);
+    UIHelper::renderText(m_renderer, starText, WINDOW_WIDTH - 100, 10, 20, 255, 220, 0);
+
+    // Level indicator
+    std::string levelText = "Level " + std::to_string(m_level->getLevelNumber());
+    UIHelper::renderText(m_renderer, levelText, WINDOW_WIDTH / 2 - 40, 10, 18, 255, 255, 255);
+
     // Corruption Effects (Overlay)
     m_corruptionSystem->render(m_renderer, m_corruptionLevel);
 
@@ -436,7 +541,11 @@ void Game::setState(GameState newState) {
 
         case GameState::PLAYING:
             if (oldState == GameState::MAIN_MENU) {
+                // Start new game
                 m_audioManager->playMusic("level");
+                m_level->loadLevel(1, m_audioManager.get());  // Load Level 1
+                m_player->setPosition(50.0f, 400.0f);         // Reset player position
+                std::cout << "[Game] Loaded Level 1: Welcome to Paradise" << std::endl;
             } else if (oldState == GameState::PAUSED) {
                 m_audioManager->resumeMusic();
             }
