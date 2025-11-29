@@ -2,6 +2,20 @@
 
 Ein psychologisches Horror-Game im Stil von Sonic.exe, das die "vierte Wand" durchbricht.
 
+## ⚡ Current Status: PLAYABLE!
+
+The game is now **fully playable** with:
+- ✅ Complete platformer mechanics (jump, gravity, collision)
+- ✅ 4 enemy types with unique AI behaviors
+- ✅ Combat system (jump on enemies or take damage)
+- ✅ 3 fully implemented levels with enemies and collectibles
+- ✅ Health system with UI, death/respawn
+- ✅ 11 procedurally generated audio files
+- ✅ Meta-horror features (file creation, window manipulation, fake BSOD)
+- ✅ Jumpscare system with corruption effects
+
+**To run:** Install SDL2 dependencies (see Installation below), build with `./build.sh`, and play!
+
 ## 🎮 Konzept
 
 ECHOES startet als niedliches Retro-Platformer-Spiel, transformiert sich aber langsam in einen Meta-Horror-Albtraum. Das Spiel:
@@ -141,13 +155,25 @@ Was als niedliches Platformer-Game beginnt, entwickelt sich zu einem Meta-Horror
 - [x] Jumpscare System
 - [x] Fake Blue Screen of Death
 
-### 🚧 Phase 3 - Content (In Arbeit)
-- [ ] Audio-Dateien (Free Sounds) - siehe `assets/audio/AUDIO_DOWNLOAD.md`
-- [ ] Erweiterte Level (10 Level)
+### ✅ Phase 3 - Gameplay Systems (FERTIG!)
+- [x] Audio-Dateien (11 Generated Sounds) - siehe `assets/audio/`
+- [x] Enemy System (4 enemy types: Green Slime, Blue Bird, Glitch Slime, Spike Ball)
+- [x] Player Health & Death System
+- [x] Collision Detection (Player vs Enemies, jump-on mechanic)
+- [x] Collectibles System (Stars)
+- [x] Level System (3 levels implemented)
+  - [x] Level 1: Welcome to Paradise (2 slimes, 1 bird, 5 stars)
+  - [x] Level 2: Sunny Meadows (3 slimes, 2 birds, 6 stars)
+  - [x] Level 3: Glitched Meadows (first corruption!)
+- [x] In-Game UI (Health bar, Star counter, Level indicator)
+- [x] Death/Respawn System
+
+### 🚧 Phase 3.5 - Advanced Content (TODO)
+- [ ] Levels 4-10 (Boss fights, corrupted levels, finale)
 - [ ] Story-Sequenzen/Cutscenes
-- [ ] NPC-System
-- [ ] Enemy AI
-- [ ] Boss Fights
+- [ ] NPC-System with dialogue
+- [ ] Boss AI (Mirror Echo, The Glitch, Spike Wall, etc.)
+- [ ] Advanced platforming mechanics
 
 ### 📋 Phase 4 - Advanced (Geplant)
 - [ ] Kamera-Integration (OpenCV)
