@@ -42,6 +42,8 @@ set(SOURCES
     src/FakeBlueScreen.cpp
     src/JumpscareSystem.cpp
     src/Enemy.cpp
+    src/NPC.cpp
+    src/Boss.cpp
 )
 
 set(HEADERS
@@ -60,6 +62,8 @@ set(HEADERS
     src/FakeBlueScreen.h
     src/JumpscareSystem.h
     src/Enemy.h
+    src/NPC.h
+    src/Boss.h
 )
 
 # Executable
