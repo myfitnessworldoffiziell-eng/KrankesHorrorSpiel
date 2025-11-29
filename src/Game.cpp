@@ -11,6 +11,8 @@
 #include "DialogSystem.h"
 #include "FakeBlueScreen.h"
 #include "JumpscareSystem.h"
+#include "NPC.h"
+#include "Boss.h"
 #include <iostream>
 #include <cmath>
 
@@ -26,6 +28,8 @@ Game::Game()
     , m_gameTime(0.0f)
     , m_totalTime(0.0f)
     , m_corruptionLevel(0)
+    , m_currentLevel(1)
+    , m_activeNPC(nullptr)
 {
 }
 
@@ -185,6 +189,25 @@ void Game::handleEvents() {
                 if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
                     setState(GameState::PAUSED);
                 }
+                // E key for NPC interaction
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e) {
+                    // Check if near an NPC
+                    for (auto& npc : m_level->getNPCs()) {
+                        if (npc && npc->isPlayerNearby(m_player->getX(), m_player->getY())) {
+                            // Start dialogue with this NPC
+                            npc->interact();
+                            m_activeNPC = npc.get();
+
+                            // Show first dialogue line
+                            if (npc->hasDialogue()) {
+                                m_dialogSystem->addDialog("NPC", npc->getCurrentLine(), 0.0f);
+                                m_dialogSystem->start();
+                                setState(GameState::DIALOG);
+                            }
+                            break;
+                        }
+                    }
+                }
                 // Debug keys
                 if (event.type == SDL_KEYDOWN) {
                     switch (event.key.keysym.sym) {
@@ -210,6 +233,17 @@ void Game::handleEvents() {
 
             case GameState::DIALOG:
                 m_dialogSystem->handleInput(event);
+                // Allow advancing NPC dialogue with E or Enter
+                if (event.type == SDL_KEYDOWN &&
+                    (event.key.keysym.sym == SDLK_e || event.key.keysym.sym == SDLK_RETURN)) {
+                    if (m_activeNPC && m_activeNPC->hasMoreLines()) {
+                        m_activeNPC->nextLine();
+                        m_dialogSystem->addDialog("NPC", m_activeNPC->getCurrentLine(), 0.0f);
+                    } else {
+                        // No more dialogue, clear active NPC
+                        m_activeNPC = nullptr;
+                    }
+                }
                 break;
 
             case GameState::FAKE_CRASH:
@@ -314,8 +348,8 @@ void Game::updatePlaying(float deltaTime) {
     // Player Update
     m_player->update(deltaTime);
 
-    // Level Update
-    m_level->update(deltaTime);
+    // Level Update (now includes player for boss AI)
+    m_level->update(deltaTime, m_player.get());
 
     // === COLLISION DETECTION ===
 
@@ -361,6 +395,12 @@ void Game::updatePlaying(float deltaTime) {
                 }
             }
         }
+
+        // Check for code fragment collection
+        checkCodeFragmentCollection();
+
+        // Check for goal portal entry
+        checkGoalPortal();
     }
 
     // Check if player died
@@ -498,8 +538,22 @@ void Game::renderPlaying() {
     UIHelper::renderText(m_renderer, starText, WINDOW_WIDTH - 100, 10, 20, 255, 220, 0);
 
     // Level indicator
-    std::string levelText = "Level " + std::to_string(m_level->getLevelNumber());
+    std::string levelText = "Level " + std::to_string(m_currentLevel);
     UIHelper::renderText(m_renderer, levelText, WINDOW_WIDTH / 2 - 40, 10, 18, 255, 255, 255);
+
+    // Code Fragment indicator (top left, below health)
+    if (!m_collectedCodeFragments.empty()) {
+        std::string fragmentText = "Code: " + std::to_string(m_collectedCodeFragments.size()) + "/3";
+        UIHelper::renderText(m_renderer, fragmentText, 10, 40, 16, 0, 255, 255);
+    }
+
+    // NPC Interaction hint (center bottom)
+    for (const auto& npc : m_level->getNPCs()) {
+        if (npc && npc->isPlayerNearby(m_player->getX(), m_player->getY())) {
+            UIHelper::renderText(m_renderer, "[E] Talk", WINDOW_WIDTH / 2 - 30, WINDOW_HEIGHT - 40, 18, 255, 255, 0);
+            break;
+        }
+    }
 
     // Corruption Effects (Overlay)
     m_corruptionSystem->render(m_renderer, m_corruptionLevel);
@@ -556,10 +610,13 @@ void Game::setState(GameState newState) {
         case GameState::PLAYING:
             if (oldState == GameState::MAIN_MENU) {
                 // Start new game
+                m_currentLevel = 1;
+                m_collectedCodeFragments.clear();
+                m_activeNPC = nullptr;
                 m_audioManager->playMusic("level");
-                m_level->loadLevel(1, m_audioManager.get());  // Load Level 1
+                m_level->loadLevel(m_currentLevel, m_audioManager.get());  // Load Level 1
                 m_player->setPosition(50.0f, 400.0f);         // Reset player position
-                std::cout << "[Game] Loaded Level 1: Welcome to Paradise" << std::endl;
+                std::cout << "[Game] Started new game - Level 1: Welcome to Paradise" << std::endl;
             } else if (oldState == GameState::PAUSED) {
                 m_audioManager->resumeMusic();
             }
@@ -654,4 +711,111 @@ void Game::triggerFakeBSOD() {
     std::cout << "[DEBUG] Fake Blue Screen!" << std::endl;
     m_fakeBlueScreen->trigger(10.0f); // 10 seconds
     setState(GameState::FAKE_CRASH);
+}
+
+// ========================================
+// Level Progression & Interaction Methods
+// ========================================
+
+void Game::checkNPCInteractions() {
+    // This is now handled in handleEvents() for E key press
+    // Could be used for auto-triggers in future
+}
+
+void Game::checkCodeFragmentCollection() {
+    for (auto& fragment : m_level->getCodeFragments()) {
+        if (!fragment.collected) {
+            // Check distance to player
+            float dx = m_player->getX() - fragment.x;
+            float dy = m_player->getY() - fragment.y;
+            float distance = std::sqrt(dx * dx + dy * dy);
+
+            if (distance < 30.0f) {  // Collection radius
+                fragment.collected = true;
+                m_collectedCodeFragments.push_back(fragment.code);
+
+                m_audioManager->playSound("collect", 150);
+                std::cout << "[Game] CODE FRAGMENT COLLECTED: \"" << fragment.code << "\"" << std::endl;
+                std::cout << "[Game] Total fragments: " << m_collectedCodeFragments.size() << "/3" << std::endl;
+
+                // Special message if all 3 collected
+                if (m_collectedCodeFragments.size() == 3) {
+                    std::cout << "[Game] *** ALL CODE FRAGMENTS COLLECTED! TRUE ENDING UNLOCKED! ***" << std::endl;
+                    m_dialogSystem->addDialog("", "The code is complete...", 3.0f);
+                    m_dialogSystem->addDialog("", "F I R S T  E N D", 0.0f);
+                    m_dialogSystem->start();
+                    setState(GameState::DIALOG);
+                }
+            }
+        }
+    }
+}
+
+void Game::checkGoalPortal() {
+    const auto& goal = m_level->getGoal();
+
+    // Only check if goal is active
+    if (!goal.active) return;
+
+    // Check player collision with goal portal
+    SDL_Rect playerBounds = m_player->getBounds();
+    SDL_Rect goalBounds = {
+        static_cast<int>(goal.x),
+        static_cast<int>(goal.y),
+        static_cast<int>(goal.width),
+        static_cast<int>(goal.height)
+    };
+
+    if (SDL_HasIntersection(&playerBounds, &goalBounds)) {
+        std::cout << "[Game] Player entered goal portal!" << std::endl;
+        advanceToNextLevel();
+    }
+}
+
+void Game::advanceToNextLevel() {
+    m_currentLevel++;
+
+    std::cout << "========================================" << std::endl;
+    std::cout << "  ADVANCING TO LEVEL " << m_currentLevel << std::endl;
+    std::cout << "========================================" << std::endl;
+
+    if (m_currentLevel > 10) {
+        // Game complete!
+        std::cout << "[Game] *** GAME COMPLETE! ***" << std::endl;
+
+        // Check ending type
+        if (m_collectedCodeFragments.size() == 3) {
+            std::cout << "[Game] ENDING C: The Developer's Escape (TRUE ENDING)" << std::endl;
+            m_dialogSystem->addDialog("Echo", "You... found the code.", 3.0f);
+            m_dialogSystem->addDialog("Echo", "The one Marcus left behind.", 3.0f);
+            m_dialogSystem->addDialog("Echo", "F I R S T   E N D", 3.0f);
+            m_dialogSystem->addDialog("", "You are free.", 0.0f);
+        } else {
+            std::cout << "[Game] ENDING A: The Cycle Continues" << std::endl;
+            m_dialogSystem->addDialog("Echo", "You finished the game.", 3.0f);
+            m_dialogSystem->addDialog("Echo", "But did you really?", 3.0f);
+            m_dialogSystem->addDialog("", "The game restarts...", 0.0f);
+        }
+
+        m_dialogSystem->start();
+        setState(GameState::DIALOG);
+
+        // Reset to level 1 after completing
+        m_currentLevel = 1;
+        m_level->loadLevel(m_currentLevel, m_audioManager.get());
+        m_player->setPosition(50.0f, 400.0f);
+    } else {
+        // Load next level
+        m_level->loadLevel(m_currentLevel, m_audioManager.get());
+        m_player->setPosition(50.0f, 400.0f);  // Reset player position
+
+        // Level-specific music changes
+        if (m_currentLevel >= 7) {
+            m_audioManager->playMusic("horror_ambient");
+        } else if (m_currentLevel >= 4) {
+            m_audioManager->playMusic("corrupted");
+        }
+
+        std::cout << "[Game] Loaded Level " << m_currentLevel << std::endl;
+    }
 }

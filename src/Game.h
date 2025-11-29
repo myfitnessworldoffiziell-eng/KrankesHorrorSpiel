@@ -112,6 +112,17 @@ private:
     // Horror State
     int m_corruptionLevel; // 0-100, steigt mit Zeit
 
+    // Level Progression
+    int m_currentLevel; // Current level number (1-10)
+    std::vector<std::string> m_collectedCodeFragments; // Collected code fragments for true ending
+    NPC* m_activeNPC; // Currently interacting NPC
+
+    // Helper methods
+    void checkNPCInteractions();
+    void checkCodeFragmentCollection();
+    void checkGoalPortal();
+    void advanceToNextLevel();
+
     // Constants
     static constexpr int WINDOW_WIDTH = 800;
     static constexpr int WINDOW_HEIGHT = 600;
