@@ -120,7 +120,7 @@ void Player::takeDamage(int damage) {
         if (m_health <= 0) {
             m_audioManager->playSound("death", 120);
         } else {
-            // TODO: Add hit sound
+            m_audioManager->playSound("hit", 100);
         }
     }
 

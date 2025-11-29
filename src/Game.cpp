@@ -108,16 +108,30 @@ bool Game::initialize() {
     // Audio Manager initialisieren
     m_audioManager->initialize();
 
-    // Audio-Dateien laden (optional - wenn vorhanden)
-    std::cout << "Loading audio files (optional)..." << std::endl;
+    // Audio-Dateien laden (14 sounds total)
+    std::cout << "Loading audio files..." << std::endl;
+
+    // Music (4 tracks)
     m_audioManager->loadMusic("menu", "assets/audio/menu_music.mp3");
     m_audioManager->loadMusic("level", "assets/audio/level_music.mp3");
     m_audioManager->loadMusic("corrupted", "assets/audio/corrupted_music.mp3");
+    m_audioManager->loadMusic("horror_ambient", "assets/audio/horror_ambient.mp3");
+
+    // SFX - Gameplay (6 sounds)
     m_audioManager->loadSound("jump", "assets/audio/jump.wav");
     m_audioManager->loadSound("collect", "assets/audio/collect.wav");
     m_audioManager->loadSound("death", "assets/audio/death.wav");
+    m_audioManager->loadSound("hit", "assets/audio/hit.wav");
+    m_audioManager->loadSound("chirp", "assets/audio/chirp.wav");
+    m_audioManager->loadSound("zap", "assets/audio/zap.wav");
+
+    // Horror SFX (4 sounds)
     m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.wav");
     m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.wav");
+    m_audioManager->loadSound("scare_appear", "assets/audio/scare_appear.wav");
+    m_audioManager->loadSound("scare_audio", "assets/audio/scare_audio.wav");
+
+    std::cout << "✓ Loaded 14 audio files (4 music + 10 SFX)" << std::endl;
 
     m_isRunning = true;
     m_lastFrameTime = SDL_GetTicks();

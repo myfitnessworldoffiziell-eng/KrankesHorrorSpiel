@@ -194,6 +194,23 @@ def main():
     spike = square_wave(1000, 0.05, 0.6)
     save_wav("scare_audio.wav", spike)
 
+    # HIT - Player damage (quick harsh sound)
+    hit = square_wave(150, 0.08, 0.35)
+    hit = apply_envelope(hit, 0.02, 0.7)
+    save_wav("hit.wav", hit)
+
+    # CHIRP - Bird sound (quick high notes)
+    chirp = []
+    chirp.extend(sine_wave(1200, 0.05, 0.2))
+    chirp.extend(sine_wave(1400, 0.05, 0.15))
+    save_wav("chirp.wav", chirp)
+
+    # ZAP - Glitch teleport (electronic sweep)
+    zap = frequency_sweep(2000, 400, 0.12, 0.3)
+    zap_noise = noise(0.12, 0.1)
+    zap_mixed = mix([zap, zap_noise])
+    save_wav("zap.wav", zap_mixed)
+
     print()
     print("=" * 50)
     print("  ✓ All sounds generated!")
@@ -201,9 +218,9 @@ def main():
     print()
     print(f"📁 Location: {AUDIO_DIR}/")
     print()
-    print("11 audio files created:")
+    print("14 audio files created:")
     print("  • 4x Music (Menu, Level, Corrupted, Ambient)")
-    print("  • 3x SFX (Jump, Collect, Death)")
+    print("  • 6x SFX (Jump, Collect, Death, Hit, Chirp, Zap)")
     print("  • 4x Horror (Jumpscare, Noise, 2x Scares)")
     print()
     print("🎮 Your game now has SOUND! 🔊")

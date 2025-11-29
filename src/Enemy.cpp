@@ -151,7 +151,9 @@ void BlueBird::update(float deltaTime) {
     // Chirp sound occasionally
     m_chirpTimer += deltaTime;
     if (m_chirpTimer > 5.0f) {
-        // TODO: Play chirp sound
+        if (m_audioManager) {
+            m_audioManager->playSound("chirp", 80);
+        }
         m_chirpTimer = 0.0f;
     }
 }
@@ -230,8 +232,12 @@ void GlitchSlime::update(float deltaTime) {
         m_isTeleporting = true;
         m_teleportTimer = 0.0f;
 
+        // Play ZAP sound
+        if (m_audioManager) {
+            m_audioManager->playSound("zap", 110);
+        }
+
         // TODO: Screen flash magenta
-        // TODO: ZAP sound
 
         // Random new position
         static std::random_device rd;
