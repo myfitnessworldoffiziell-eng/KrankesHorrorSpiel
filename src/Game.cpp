@@ -15,6 +15,7 @@
 #include "Boss.h"
 #include "GlitchBoss.h"
 #include "EchoPrime.h"
+#include "BossDefeatHorror.h"
 #include <iostream>
 #include <cmath>
 
@@ -107,6 +108,7 @@ bool Game::initialize() {
     m_dialogSystem = std::make_unique<DialogSystem>();
     m_fakeBlueScreen = std::make_unique<FakeBlueScreen>();
     m_jumpscareSystem = std::make_unique<JumpscareSystem>(m_audioManager.get());
+    m_bossDefeatHorror = std::make_unique<BossDefeatHorror>(m_audioManager.get(), m_permissionManager.get());
 
     // Meta-Horror initialisieren (erstellt erste Dateien)
     m_metaHorror->initialize();
@@ -282,6 +284,9 @@ void Game::update(float deltaTime) {
         case GameState::FAKE_CRASH:
             updateFakeCrash(deltaTime);
             break;
+        case GameState::BOSS_HORROR:
+            updateBossHorror(deltaTime);
+            break;
         default:
             break;
     }
@@ -310,6 +315,9 @@ void Game::render() {
             break;
         case GameState::FAKE_CRASH:
             renderFakeCrash();
+            break;
+        case GameState::BOSS_HORROR:
+            renderBossHorror();
             break;
         default:
             break;
@@ -445,6 +453,16 @@ void Game::updatePlaying(float deltaTime) {
             }
         }
 
+        // Check if boss was just defeated (trigger horror sequence!)
+        if (m_level->hasBoss()) {
+            Boss* boss = m_level->getBoss();
+            if (boss && boss->isDefeated() && !m_bossDefeatHorror->isActive()) {
+                std::cout << "[Game] 💀 BOSS DEFEATED - TRIGGERING EXTREME HORROR SEQUENCE! 💀" << std::endl;
+                m_bossDefeatHorror->trigger(boss->getName());
+                setState(GameState::BOSS_HORROR);
+            }
+        }
+
         // Player vs Stars (collectibles)
         for (auto& star : m_level->getStars()) {
             if (!star.collected) {
@@ -544,6 +562,16 @@ void Game::updateFakeCrash(float deltaTime) {
 
     // Return to PLAYING when BSOD finished
     if (!m_fakeBlueScreen->isActive()) {
+        setState(GameState::PLAYING);
+    }
+}
+
+void Game::updateBossHorror(float deltaTime) {
+    m_bossDefeatHorror->update(deltaTime);
+    m_bossDefeatHorror->updateWindow(m_window);
+
+    // Return to PLAYING when horror sequence finished
+    if (m_bossDefeatHorror->isComplete()) {
         setState(GameState::PLAYING);
     }
 }
@@ -677,6 +705,10 @@ void Game::renderDialog() {
 
 void Game::renderFakeCrash() {
     m_fakeBlueScreen->render(m_renderer);
+}
+
+void Game::renderBossHorror() {
+    m_bossDefeatHorror->render(m_renderer);
 }
 
 void Game::setState(GameState newState) {

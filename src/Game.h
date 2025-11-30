@@ -20,6 +20,8 @@ class PauseMenu;
 class DialogSystem;
 class FakeBlueScreen;
 class JumpscareSystem;
+class BossDefeatHorror;
+class NPC;
 
 /**
  * Haupt-Game-Klasse für ECHOES.exe
@@ -67,12 +69,14 @@ private:
     void updatePaused(float deltaTime);
     void updateDialog(float deltaTime);
     void updateFakeCrash(float deltaTime);
+    void updateBossHorror(float deltaTime);
 
     void renderMainMenu();
     void renderPlaying();
     void renderPaused();
     void renderDialog();
     void renderFakeCrash();
+    void renderBossHorror();
 
     // SDL Components
     SDL_Window* m_window;
@@ -103,6 +107,7 @@ private:
     // Horror Systems
     std::unique_ptr<FakeBlueScreen> m_fakeBlueScreen;
     std::unique_ptr<JumpscareSystem> m_jumpscareSystem;
+    std::unique_ptr<BossDefeatHorror> m_bossDefeatHorror;
 
     // Game Timers
     Uint32 m_lastFrameTime;
