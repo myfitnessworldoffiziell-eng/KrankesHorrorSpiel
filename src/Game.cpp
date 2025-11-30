@@ -13,6 +13,8 @@
 #include "JumpscareSystem.h"
 #include "NPC.h"
 #include "Boss.h"
+#include "GlitchBoss.h"
+#include "EchoPrime.h"
 #include <iostream>
 #include <cmath>
 
@@ -380,6 +382,58 @@ void Game::updatePlaying(float deltaTime) {
             }
         }
 
+        // Player vs Boss (and boss attacks)
+        if (m_level->hasBoss()) {
+            Boss* boss = m_level->getBoss();
+            if (boss && boss->isAlive()) {
+                SDL_Rect bossBounds = boss->getBounds();
+
+                // Check collision with boss body
+                if (SDL_HasIntersection(&playerBounds, &bossBounds)) {
+                    // Boss contact damages player
+                    m_player->takeDamage(20);  // Boss does significant damage
+                    std::cout << "[Game] Hit by boss! Health: " << m_player->getHealth() << std::endl;
+                }
+
+                // Check collision with boss projectiles (GlitchBoss)
+                if (auto* glitchBoss = dynamic_cast<GlitchBoss*>(boss)) {
+                    for (const auto& proj : glitchBoss->getProjectiles()) {
+                        if (!proj.active) continue;
+
+                        SDL_Rect projBounds = {
+                            static_cast<int>(proj.x) - 5,
+                            static_cast<int>(proj.y) - 5,
+                            10, 10
+                        };
+
+                        if (SDL_HasIntersection(&playerBounds, &projBounds)) {
+                            m_player->takeDamage(10);  // Projectile damage
+                            std::cout << "[Game] Hit by boss projectile! Health: " << m_player->getHealth() << std::endl;
+                            // Note: We can't easily mark the projectile as inactive from here
+                        }
+                    }
+                }
+
+                // Check collision with Echo clones (EchoPrime)
+                if (auto* echoPrime = dynamic_cast<EchoPrime*>(boss)) {
+                    for (const auto& clone : echoPrime->getClones()) {
+                        if (!clone.active) continue;
+
+                        SDL_Rect cloneBounds = {
+                            static_cast<int>(clone.x) - 20,
+                            static_cast<int>(clone.y) - 20,
+                            40, 40
+                        };
+
+                        if (SDL_HasIntersection(&playerBounds, &cloneBounds)) {
+                            m_player->takeDamage(15);  // Clone damage
+                            std::cout << "[Game] Hit by Echo clone! Health: " << m_player->getHealth() << std::endl;
+                        }
+                    }
+                }
+            }
+        }
+
         // Player vs Stars (collectibles)
         for (auto& star : m_level->getStars()) {
             if (!star.collected) {
@@ -552,6 +606,46 @@ void Game::renderPlaying() {
         if (npc && npc->isPlayerNearby(m_player->getX(), m_player->getY())) {
             UIHelper::renderText(m_renderer, "[E] Talk", WINDOW_WIDTH / 2 - 30, WINDOW_HEIGHT - 40, 18, 255, 255, 0);
             break;
+        }
+    }
+
+    // Boss UI (Health Bar, Name, Phase)
+    if (m_level->hasBoss()) {
+        Boss* boss = m_level->getBoss();
+        if (boss && boss->isAlive()) {
+            // Boss Name (top center)
+            std::string bossName = boss->getName();
+            UIHelper::renderText(m_renderer, bossName, WINDOW_WIDTH / 2 - 60, 50, 24, 255, 50, 50);
+
+            // Boss Health Bar (below name)
+            int bossHPBarX = WINDOW_WIDTH / 2 - 200;
+            int bossHPBarY = 80;
+            int bossHPBarWidth = 400;
+            int bossHPBarHeight = 30;
+
+            // Background
+            SDL_SetRenderDrawColor(m_renderer, 50, 0, 0, 200);
+            SDL_Rect bossHPBg = {bossHPBarX, bossHPBarY, bossHPBarWidth, bossHPBarHeight};
+            SDL_RenderFillRect(m_renderer, &bossHPBg);
+
+            // HP Fill (red)
+            int bossHPPercent = (boss->getHP() * 100) / boss->getMaxHP();
+            int bossFillWidth = (bossHPBarWidth * bossHPPercent) / 100;
+            SDL_SetRenderDrawColor(m_renderer, 255, 0, 0, 255);
+            SDL_Rect bossHPFill = {bossHPBarX, bossHPBarY, bossFillWidth, bossHPBarHeight};
+            SDL_RenderFillRect(m_renderer, &bossHPFill);
+
+            // Border
+            SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);
+            SDL_RenderDrawRect(m_renderer, &bossHPBg);
+
+            // HP Text
+            std::string hpText = std::to_string(boss->getHP()) + " / " + std::to_string(boss->getMaxHP());
+            UIHelper::renderText(m_renderer, hpText, WINDOW_WIDTH / 2 - 30, bossHPBarY + 5, 18, 255, 255, 255);
+
+            // Boss Phase indicator
+            std::string phaseText = "Phase " + std::to_string(static_cast<int>(boss->getPhase()));
+            UIHelper::renderText(m_renderer, phaseText, WINDOW_WIDTH / 2 - 40, 120, 16, 255, 200, 0);
         }
     }
 
@@ -783,14 +877,35 @@ void Game::advanceToNextLevel() {
         // Game complete!
         std::cout << "[Game] *** GAME COMPLETE! ***" << std::endl;
 
-        // Check ending type
+        // Check ending type (priority: C > B > A)
+        bool hasCamera = m_permissionManager->hasCameraPermission();
+        bool hasMicrophone = m_permissionManager->hasMicrophonePermission();
+
         if (m_collectedCodeFragments.size() == 3) {
+            // ENDING C: The Developer's Escape (TRUE ENDING)
             std::cout << "[Game] ENDING C: The Developer's Escape (TRUE ENDING)" << std::endl;
             m_dialogSystem->addDialog("Echo", "You... found the code.", 3.0f);
             m_dialogSystem->addDialog("Echo", "The one Marcus left behind.", 3.0f);
             m_dialogSystem->addDialog("Echo", "F I R S T   E N D", 3.0f);
             m_dialogSystem->addDialog("", "You are free.", 0.0f);
+        } else if (hasCamera && hasMicrophone) {
+            // ENDING B: Digital Ghost (Permission-based)
+            std::cout << "[Game] ENDING B: Digital Ghost" << std::endl;
+
+            // Create creepy files
+            m_metaHorror->createFile("screenshot.png", "I can see you...");
+            m_metaHorror->createFile("recording.wav", "I can hear you...");
+
+            m_dialogSystem->addDialog("Echo", "Thank you for the permissions.", 3.0f);
+            m_dialogSystem->addDialog("Echo", "Your camera... your microphone...", 3.0f);
+            m_dialogSystem->addDialog("Echo", "I can see you. I can hear you.", 3.0f);
+            m_dialogSystem->addDialog("Echo", "Now I'm not just in the game...", 3.0f);
+            m_dialogSystem->addDialog("", "I'm with you. Forever.", 0.0f);
+
+            // Play horror sound
+            m_audioManager->playSound("scare_audio", 100);
         } else {
+            // ENDING A: The Cycle Continues (Normal ending)
             std::cout << "[Game] ENDING A: The Cycle Continues" << std::endl;
             m_dialogSystem->addDialog("Echo", "You finished the game.", 3.0f);
             m_dialogSystem->addDialog("Echo", "But did you really?", 3.0f);

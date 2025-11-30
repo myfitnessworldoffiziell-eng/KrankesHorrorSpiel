@@ -44,6 +44,8 @@ set(SOURCES
     src/Enemy.cpp
     src/NPC.cpp
     src/Boss.cpp
+    src/GlitchBoss.cpp
+    src/EchoPrime.cpp
 )
 
 set(HEADERS
@@ -64,6 +66,8 @@ set(HEADERS
     src/Enemy.h
     src/NPC.h
     src/Boss.h
+    src/GlitchBoss.h
+    src/EchoPrime.h
 )
 
 # Executable

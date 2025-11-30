@@ -2,6 +2,8 @@
 #include "Enemy.h"
 #include "NPC.h"
 #include "Boss.h"
+#include "GlitchBoss.h"
+#include "EchoPrime.h"
 #include "Player.h"
 #include "AudioManager.h"
 
@@ -423,15 +425,13 @@ void Level::createLevel6(AudioManager* audioManager) {
     m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
     m_platforms.push_back({200.0f, 450.0f, 400.0f, 20.0f});
 
-    // TODO: Create The Glitch Boss
-    // m_boss = std::make_unique<TheGlitch>(400.0f, 300.0f, audioManager);
+    // THE GLITCH BOSS (First encounter)
+    m_boss = std::make_unique<GlitchBoss>(400.0f, 300.0f, audioManager);
 
     auto bossNPC = std::make_unique<NPC>(50.0f, 500.0f, NPCType::CORRUPTED, audioManager);
     bossNPC->addDialogue("T̶h̵e̴ ̷G̸l̸i̸t̵c̴h̷ ̸a̶w̴a̴i̶t̶s̴");
-    bossNPC->addDialogue("[BOSS NOT YET IMPLEMENTED]");
+    bossNPC->addDialogue("Defeat it to proceed...");
     m_npcs.push_back(std::move(bossNPC));
-
-    m_stars.push_back({400.0f, 420.0f, false});
 
     m_goal = {750.0f, 480.0f, 40.0f, 60.0f, false};
 }
@@ -517,11 +517,12 @@ void Level::createLevel8(AudioManager* audioManager) {
     m_platforms.push_back({400.0f, 450.0f, 100.0f, 20.0f});
     m_platforms.push_back({550.0f, 320.0f, 100.0f, 20.0f});
 
-    // All enemy types
+    // THE GLITCH BOSS (Second encounter - Harder!)
+    m_boss = std::make_unique<GlitchBoss>(400.0f, 250.0f, audioManager);
+
+    // All enemy types (chaos level)
     m_enemies.push_back(std::make_unique<GreenSlime>(200.0f, 518.0f, audioManager));
-    m_enemies.push_back(std::make_unique<BlueBird>(300.0f, 250.0f, 150.0f, 450.0f, audioManager));
-    m_enemies.push_back(std::make_unique<GlitchSlime>(400.0f, 518.0f, audioManager));
-    m_enemies.push_back(std::make_unique<SpikeBall>(500.0f, 250.0f, audioManager));
+    m_enemies.push_back(std::make_unique<GlitchSlime>(600.0f, 518.0f, audioManager));
 
     // Collective madness NPC
     auto chaosNPC = std::make_unique<NPC>(50.0f, 500.0f, NPCType::CORRUPTED, audioManager);
@@ -580,13 +581,13 @@ void Level::createLevel10(AudioManager* audioManager) {
 
     m_platforms.push_back({200.0f, 550.0f, 400.0f, 50.0f});
 
-    // TODO: Create Echo Prime Boss
-    // m_boss = std::make_unique<EchoPrime>(400.0f, 300.0f, audioManager);
+    // ECHO PRIME - FINAL BOSS
+    m_boss = std::make_unique<EchoPrime>(400.0f, 300.0f, audioManager);
 
     auto finalNPC = std::make_unique<NPC>(300.0f, 500.0f, NPCType::CORRUPTED, audioManager);
     finalNPC->addDialogue("You made it.");
     finalNPC->addDialogue("Through all my trials.");
-    finalNPC->addDialogue("[FINAL BOSS NOT YET IMPLEMENTED]");
+    finalNPC->addDialogue("Now face me... Echo Prime.");
     m_npcs.push_back(std::move(finalNPC));
 
     // No regular stars - only boss matters
