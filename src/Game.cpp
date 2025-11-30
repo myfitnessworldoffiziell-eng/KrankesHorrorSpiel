@@ -16,6 +16,9 @@
 #include "GlitchBoss.h"
 #include "EchoPrime.h"
 #include "BossDefeatHorror.h"
+#include "PCHorror.h"
+#include "GameOverScreen.h"
+#include "CreditsScreen.h"
 #include <iostream>
 #include <cmath>
 
@@ -33,6 +36,7 @@ Game::Game()
     , m_corruptionLevel(0)
     , m_currentLevel(1)
     , m_activeNPC(nullptr)
+    , m_deathCount(0)
 {
 }
 
@@ -106,9 +110,12 @@ bool Game::initialize() {
     m_mainMenu = std::make_unique<MainMenu>();
     m_pauseMenu = std::make_unique<PauseMenu>();
     m_dialogSystem = std::make_unique<DialogSystem>();
+    m_gameOverScreen = std::make_unique<GameOverScreen>(m_audioManager.get());
+    m_creditsScreen = std::make_unique<CreditsScreen>();
     m_fakeBlueScreen = std::make_unique<FakeBlueScreen>();
     m_jumpscareSystem = std::make_unique<JumpscareSystem>(m_audioManager.get());
     m_bossDefeatHorror = std::make_unique<BossDefeatHorror>(m_audioManager.get(), m_permissionManager.get());
+    m_pcHorror = std::make_unique<PCHorror>(m_window, m_audioManager.get(), m_metaHorror.get());
 
     // Meta-Horror initialisieren (erstellt erste Dateien)
     m_metaHorror->initialize();
@@ -257,6 +264,29 @@ void Game::handleEvents() {
                 }
                 break;
 
+            case GameState::GAME_OVER:
+                // Handle game over input
+                if (event.type == SDL_KEYDOWN) {
+                    if (event.key.keysym.sym == SDLK_SPACE) {
+                        // Trigger respawn (handled in updateGameOver)
+                        m_gameOverScreen->reset();
+                        m_gameOverScreen->trigger(m_deathCount, m_currentLevel);
+                    } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        // Quit to menu
+                        setState(GameState::MAIN_MENU);
+                        m_gameOverScreen->reset();
+                    }
+                }
+                break;
+
+            case GameState::CREDITS:
+                // Allow skip with ESC
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+                    setState(GameState::MAIN_MENU);
+                    m_creditsScreen->reset();
+                }
+                break;
+
             default:
                 break;
         }
@@ -286,6 +316,12 @@ void Game::update(float deltaTime) {
             break;
         case GameState::BOSS_HORROR:
             updateBossHorror(deltaTime);
+            break;
+        case GameState::GAME_OVER:
+            updateGameOver(deltaTime);
+            break;
+        case GameState::CREDITS:
+            updateCredits(deltaTime);
             break;
         default:
             break;
@@ -318,6 +354,12 @@ void Game::render() {
             break;
         case GameState::BOSS_HORROR:
             renderBossHorror();
+            break;
+        case GameState::GAME_OVER:
+            renderGameOver();
+            break;
+        case GameState::CREDITS:
+            renderCredits();
             break;
         default:
             break;
@@ -487,13 +529,11 @@ void Game::updatePlaying(float deltaTime) {
     }
 
     // Check if player died
-    if (!m_player->isAlive()) {
-        std::cout << "[Game] Player died! Respawning..." << std::endl;
-        // TODO: Game over screen or respawn
-        // For now, respawn at start
-        m_player->setPosition(50.0f, 400.0f);
-        m_player->takeDamage(-100);  // Restore health (hack for now)
-        m_level->loadLevel(m_level->getLevelNumber(), m_audioManager.get());  // Reload level
+    if (!m_player->isAlive() && !m_gameOverScreen->isActive()) {
+        std::cout << "💀 [Game] Player died! Triggering Game Over screen..." << std::endl;
+        m_deathCount++;
+        m_gameOverScreen->trigger(m_deathCount, m_currentLevel);
+        setState(GameState::GAME_OVER);
     }
 
     // Meta-Horror Events
@@ -501,6 +541,75 @@ void Game::updatePlaying(float deltaTime) {
 
     // Jumpscare System
     m_jumpscareSystem->update(deltaTime, m_corruptionLevel);
+
+    // PC Horror System (Update active effects)
+    m_pcHorror->update(deltaTime);
+    m_pcHorror->updateWindow();
+
+    // PC Horror Triggers (Level-based escalation)
+    static bool level3HorrorTriggered = false;
+    static bool level5HorrorTriggered = false;
+    static bool level7HorrorTriggered = false;
+    static bool level9HorrorTriggered = false;
+
+    // Level 3: First PC horror warnings
+    if (m_currentLevel == 3 && !level3HorrorTriggered) {
+        // Wait 10 seconds into level, then trigger
+        static float level3Timer = 0.0f;
+        level3Timer += deltaTime;
+        if (level3Timer > 10.0f) {
+            m_pcHorror->triggerRandomForLevel(3);
+            level3HorrorTriggered = true;
+            std::cout << "💀 LEVEL 3 PC HORROR TRIGGERED!" << std::endl;
+        }
+    }
+
+    // Level 5: Escalating PC horror
+    if (m_currentLevel == 5 && !level5HorrorTriggered) {
+        static float level5Timer = 0.0f;
+        level5Timer += deltaTime;
+        if (level5Timer > 15.0f) {
+            // Trigger multiple effects!
+            m_pcHorror->triggerRandomForLevel(5);
+            level5HorrorTriggered = true;
+            std::cout << "🔥 LEVEL 5 PC HORROR TRIGGERED!" << std::endl;
+
+            // Trigger second effect after 5 seconds
+            static float level5SecondTrigger = 0.0f;
+            level5SecondTrigger += deltaTime;
+            if (level5SecondTrigger > 20.0f) {
+                m_pcHorror->triggerRandomForLevel(5);
+            }
+        }
+    }
+
+    // Level 7: SEVERE PC horror
+    if (m_currentLevel == 7 && !level7HorrorTriggered) {
+        static float level7Timer = 0.0f;
+        level7Timer += deltaTime;
+        if (level7Timer > 8.0f) {
+            // Immediate severe effects
+            m_pcHorror->triggerRandomForLevel(7);
+            level7HorrorTriggered = true;
+            std::cout << "💥 LEVEL 7 SEVERE PC HORROR TRIGGERED!" << std::endl;
+
+            // Chain multiple effects
+            m_pcHorror->triggerEffect(PCHorrorType::WINDOW_CHAOS_EXTREME, 10.0f, 1.0f);
+        }
+    }
+
+    // Level 9: NIGHTMARE PC horror
+    if (m_currentLevel == 9 && !level9HorrorTriggered) {
+        static float level9Timer = 0.0f;
+        level9Timer += deltaTime;
+        if (level9Timer > 5.0f) {
+            // ALL OUT CHAOS
+            m_pcHorror->triggerRandomForLevel(9);
+            m_pcHorror->triggerEffect(PCHorrorType::DESKTOP_TAKEOVER, 15.0f, 1.0f);
+            level9HorrorTriggered = true;
+            std::cout << "☠️ LEVEL 9 NIGHTMARE PC HORROR TRIGGERED!" << std::endl;
+        }
+    }
 
     // Nach 30 Sekunden: Erste creepy Dialog-Sequenz
     static bool firstDialogShown = false;
@@ -573,6 +682,49 @@ void Game::updateBossHorror(float deltaTime) {
     // Return to PLAYING when horror sequence finished
     if (m_bossDefeatHorror->isComplete()) {
         setState(GameState::PLAYING);
+    }
+}
+
+void Game::updateGameOver(float deltaTime) {
+    m_gameOverScreen->update(deltaTime);
+
+    // Check if player chose to respawn
+    if (m_gameOverScreen->shouldRespawn()) {
+        std::cout << "[Game] Player respawning..." << std::endl;
+
+        // Reset player
+        m_player->setPosition(50.0f, 400.0f);
+        m_player->takeDamage(-100);  // Restore health
+
+        // Reload level
+        m_level->loadLevel(m_currentLevel, m_audioManager.get());
+
+        // Reset game over screen
+        m_gameOverScreen->reset();
+
+        // Return to playing
+        setState(GameState::PLAYING);
+
+        // Resume normal music
+        m_audioManager->playMusic("level");
+    }
+
+    // Check if player chose to quit
+    if (m_gameOverScreen->shouldQuit()) {
+        std::cout << "[Game] Player quit from game over." << std::endl;
+        setState(GameState::MAIN_MENU);
+        m_gameOverScreen->reset();
+    }
+}
+
+void Game::updateCredits(float deltaTime) {
+    m_creditsScreen->update(deltaTime);
+
+    // Return to main menu when finished
+    if (m_creditsScreen->isFinished()) {
+        setState(GameState::MAIN_MENU);
+        m_creditsScreen->reset();
+        m_audioManager->playMusic("menu");
     }
 }
 
@@ -693,6 +845,9 @@ void Game::renderPlaying() {
 
     // Jumpscare (if active)
     m_jumpscareSystem->render(m_renderer);
+
+    // PC Horror Effects (EXTREME overlays)
+    m_pcHorror->render(m_renderer);
 }
 
 void Game::renderPaused() {
@@ -711,25 +866,53 @@ void Game::renderBossHorror() {
     m_bossDefeatHorror->render(m_renderer);
 }
 
+void Game::renderGameOver() {
+    // Render game screen dimmed in background
+    m_level->render(m_renderer);
+    m_player->render(m_renderer);
+
+    // Dark overlay
+    SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 150);
+    SDL_Rect overlay = {0, 0, 800, 600};
+    SDL_RenderFillRect(m_renderer, &overlay);
+
+    // Game over screen on top
+    m_gameOverScreen->render(m_renderer);
+}
+
+void Game::renderCredits() {
+    m_creditsScreen->render(m_renderer);
+}
+
 void Game::setState(GameState newState) {
     if (m_currentState == newState) return;
 
     std::cout << "[Game] State transition: ";
     switch (m_currentState) {
+        case GameState::INTRO: std::cout << "INTRO"; break;
         case GameState::MAIN_MENU: std::cout << "MAIN_MENU"; break;
         case GameState::PLAYING: std::cout << "PLAYING"; break;
         case GameState::PAUSED: std::cout << "PAUSED"; break;
         case GameState::DIALOG: std::cout << "DIALOG"; break;
         case GameState::FAKE_CRASH: std::cout << "FAKE_CRASH"; break;
+        case GameState::BOSS_HORROR: std::cout << "BOSS_HORROR"; break;
+        case GameState::GAME_OVER: std::cout << "GAME_OVER"; break;
+        case GameState::ENDING: std::cout << "ENDING"; break;
+        case GameState::CREDITS: std::cout << "CREDITS"; break;
         default: std::cout << "UNKNOWN"; break;
     }
     std::cout << " -> ";
     switch (newState) {
+        case GameState::INTRO: std::cout << "INTRO"; break;
         case GameState::MAIN_MENU: std::cout << "MAIN_MENU"; break;
         case GameState::PLAYING: std::cout << "PLAYING"; break;
         case GameState::PAUSED: std::cout << "PAUSED"; break;
         case GameState::DIALOG: std::cout << "DIALOG"; break;
         case GameState::FAKE_CRASH: std::cout << "FAKE_CRASH"; break;
+        case GameState::BOSS_HORROR: std::cout << "BOSS_HORROR"; break;
+        case GameState::GAME_OVER: std::cout << "GAME_OVER"; break;
+        case GameState::ENDING: std::cout << "ENDING"; break;
+        case GameState::CREDITS: std::cout << "CREDITS"; break;
         default: std::cout << "UNKNOWN"; break;
     }
     std::cout << std::endl;

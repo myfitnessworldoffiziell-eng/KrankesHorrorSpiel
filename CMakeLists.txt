@@ -47,6 +47,9 @@ set(SOURCES
     src/GlitchBoss.cpp
     src/EchoPrime.cpp
     src/BossDefeatHorror.cpp
+    src/PCHorror.cpp
+    src/GameOverScreen.cpp
+    src/CreditsScreen.cpp
 )
 
 set(HEADERS
@@ -70,6 +73,9 @@ set(HEADERS
     src/GlitchBoss.h
     src/EchoPrime.h
     src/BossDefeatHorror.h
+    src/PCHorror.h
+    src/GameOverScreen.h
+    src/CreditsScreen.h
 )
 
 # Executable

@@ -22,6 +22,9 @@ class FakeBlueScreen;
 class JumpscareSystem;
 class BossDefeatHorror;
 class NPC;
+class PCHorror;
+class GameOverScreen;
+class CreditsScreen;
 
 /**
  * Haupt-Game-Klasse für ECHOES.exe
@@ -70,6 +73,8 @@ private:
     void updateDialog(float deltaTime);
     void updateFakeCrash(float deltaTime);
     void updateBossHorror(float deltaTime);
+    void updateGameOver(float deltaTime);
+    void updateCredits(float deltaTime);
 
     void renderMainMenu();
     void renderPlaying();
@@ -77,6 +82,8 @@ private:
     void renderDialog();
     void renderFakeCrash();
     void renderBossHorror();
+    void renderGameOver();
+    void renderCredits();
 
     // SDL Components
     SDL_Window* m_window;
@@ -103,11 +110,14 @@ private:
     std::unique_ptr<MainMenu> m_mainMenu;
     std::unique_ptr<PauseMenu> m_pauseMenu;
     std::unique_ptr<DialogSystem> m_dialogSystem;
+    std::unique_ptr<GameOverScreen> m_gameOverScreen;
+    std::unique_ptr<CreditsScreen> m_creditsScreen;
 
     // Horror Systems
     std::unique_ptr<FakeBlueScreen> m_fakeBlueScreen;
     std::unique_ptr<JumpscareSystem> m_jumpscareSystem;
     std::unique_ptr<BossDefeatHorror> m_bossDefeatHorror;
+    std::unique_ptr<PCHorror> m_pcHorror;
 
     // Game Timers
     Uint32 m_lastFrameTime;
@@ -121,6 +131,7 @@ private:
     int m_currentLevel; // Current level number (1-10)
     std::vector<std::string> m_collectedCodeFragments; // Collected code fragments for true ending
     NPC* m_activeNPC; // Currently interacting NPC
+    int m_deathCount; // Number of deaths this session
 
     // Helper methods
     void checkNPCInteractions();
