@@ -390,9 +390,20 @@ void Game::updatePlaying(float deltaTime) {
 
                 // Check collision with boss body
                 if (SDL_HasIntersection(&playerBounds, &bossBounds)) {
-                    // Boss contact damages player
-                    m_player->takeDamage(20);  // Boss does significant damage
-                    std::cout << "[Game] Hit by boss! Health: " << m_player->getHealth() << std::endl;
+                    // Check if player is jumping on boss (from above)
+                    bool jumpedOnBoss = (m_player->getY() + 32 < boss->getY() + 20);
+
+                    if (jumpedOnBoss && m_player->getVelocityY() > 0) {
+                        // Player defeats boss by jumping on it!
+                        boss->takeDamage(50);  // 50 damage per jump
+                        m_player->setVelocityY(-300.0f);  // Bounce off boss
+                        m_audioManager->playSound("hit", 120);
+                        std::cout << "[Game] Jumped on boss! Boss HP: " << boss->getHP() << "/" << boss->getMaxHP() << std::endl;
+                    } else if (!boss->isInvulnerable()) {
+                        // Boss contact damages player (not invulnerable from jump)
+                        m_player->takeDamage(20);  // Boss does significant damage
+                        std::cout << "[Game] Hit by boss! Health: " << m_player->getHealth() << std::endl;
+                    }
                 }
 
                 // Check collision with boss projectiles (GlitchBoss)

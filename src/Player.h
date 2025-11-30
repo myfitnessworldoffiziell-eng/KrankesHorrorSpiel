@@ -29,6 +29,10 @@ public:
     float getY() const { return m_y; }
     void setPosition(float x, float y) { m_x = x; m_y = y; }
 
+    // Velocity (for boss jumping)
+    float getVelocityY() const { return m_velocityY; }
+    void setVelocityY(float vy) { m_velocityY = vy; }
+
     // Collision
     SDL_Rect getBounds() const;
 

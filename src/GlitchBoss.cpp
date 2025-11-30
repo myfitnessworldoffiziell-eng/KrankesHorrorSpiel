@@ -33,6 +33,9 @@ GlitchBoss::~GlitchBoss() {
 void GlitchBoss::update(float deltaTime, Player* player) {
     if (!isAlive() || !player) return;
 
+    // Update invincibility
+    updateInvincibility(deltaTime);
+
     // Update timers
     m_attackTimer += deltaTime;
     m_teleportTimer += deltaTime;

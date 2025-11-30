@@ -36,6 +36,8 @@ public:
     virtual void kill();
     bool isAlive() const { return m_alive; }
     bool isDefeated() const { return m_currentPhase == BossPhase::DEFEATED; }
+    bool isInvulnerable() const { return m_invulnerable; }
+    void updateInvincibility(float deltaTime);
 
     // Phase management
     BossPhase getCurrentPhase() const { return m_currentPhase; }
@@ -47,7 +49,8 @@ public:
     int getMaxHP() const { return m_maxHP; }
     float getX() const { return m_x; }
     float getY() const { return m_y; }
-    std::string getName() const { return m_name; }
+    virtual std::string getName() const { return m_name; }
+    BossPhase getPhase() const { return m_currentPhase; }
 
     // Dialogue
     bool hasDialogue() const { return !m_currentDialogue.empty(); }

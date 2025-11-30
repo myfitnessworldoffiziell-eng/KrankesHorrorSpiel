@@ -11,7 +11,7 @@ Boss::Boss(float x, float y, int maxHP, AudioManager* audioManager)
     , m_hp(maxHP)
     , m_maxHP(maxHP)
     , m_alive(true)
-    , m_currentPhase(BossPhase::INTRO)
+    , m_currentPhase(BossPhase::PHASE_1)
     , m_audioManager(audioManager)
     , m_name("Boss")
     , m_currentDialogue("")
@@ -31,6 +31,10 @@ void Boss::takeDamage(int damage) {
     if (m_hp < 0) m_hp = 0;
 
     std::cout << "[Boss] " << m_name << " took " << damage << " damage! HP: " << m_hp << "/" << m_maxHP << std::endl;
+
+    // Set invincibility frames (1 second)
+    m_invulnerable = true;
+    m_invulnerabilityTimer = 1.0f;
 
     if (m_audioManager) {
         m_audioManager->playSound("hit", 120);
@@ -52,6 +56,16 @@ void Boss::kill() {
 
     if (m_audioManager) {
         m_audioManager->playSound("death", 150);
+    }
+}
+
+void Boss::updateInvincibility(float deltaTime) {
+    if (m_invulnerable) {
+        m_invulnerabilityTimer -= deltaTime;
+        if (m_invulnerabilityTimer <= 0.0f) {
+            m_invulnerable = false;
+            m_invulnerabilityTimer = 0.0f;
+        }
     }
 }
 
