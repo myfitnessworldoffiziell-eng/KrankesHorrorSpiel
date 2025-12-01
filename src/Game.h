@@ -74,6 +74,7 @@ private:
     void updateFakeCrash(float deltaTime);
     void updateBossHorror(float deltaTime);
     void updateGameOver(float deltaTime);
+    void updateEnding(float deltaTime);
     void updateCredits(float deltaTime);
 
     void renderMainMenu();
@@ -83,6 +84,7 @@ private:
     void renderFakeCrash();
     void renderBossHorror();
     void renderGameOver();
+    void renderEnding();
     void renderCredits();
 
     // SDL Components
@@ -126,6 +128,13 @@ private:
 
     // Horror State
     int m_corruptionLevel; // 0-100, steigt mit Zeit
+
+    // Level-specific horror tracking
+    bool m_level3HorrorTriggered;
+    bool m_level5HorrorTriggered;
+    bool m_level7HorrorTriggered;
+    bool m_level9HorrorTriggered;
+    float m_levelHorrorTimer; // Timer since level start for horror triggers
 
     // Level Progression
     int m_currentLevel; // Current level number (1-10)

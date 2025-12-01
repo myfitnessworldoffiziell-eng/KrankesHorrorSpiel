@@ -8,8 +8,6 @@ int GameOverScreen::s_totalDeaths = 0;
 GameOverScreen::GameOverScreen(AudioManager* audioManager)
     : m_audioManager(audioManager)
     , m_active(false)
-    , m_respawn(false)
-    , m_quit(false)
     , m_timer(0.0f)
     , m_deathCount(0)
     , m_currentLevel(1)
@@ -18,8 +16,6 @@ GameOverScreen::GameOverScreen(AudioManager* audioManager)
 
 void GameOverScreen::trigger(int deathCount, int currentLevel) {
     m_active = true;
-    m_respawn = false;
-    m_quit = false;
     m_timer = 0.0f;
     m_deathCount = deathCount;
     m_currentLevel = currentLevel;
@@ -98,9 +94,8 @@ void GameOverScreen::update(float deltaTime) {
 
     m_timer += deltaTime;
 
-    // Auto-dismiss after 30 seconds (but player can skip)
+    // Auto-dismiss after 30 seconds (triggers respawn in Game::updateGameOver)
     if (m_timer > 30.0f) {
-        m_respawn = true;
         m_active = false;
     }
 }
@@ -187,7 +182,5 @@ void GameOverScreen::render(SDL_Renderer* renderer) {
 
 void GameOverScreen::reset() {
     m_active = false;
-    m_respawn = false;
-    m_quit = false;
     m_timer = 0.0f;
 }

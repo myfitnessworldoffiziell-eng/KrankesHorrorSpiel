@@ -27,12 +27,6 @@ public:
     // Check if active
     bool isActive() const { return m_active; }
 
-    // Check if player chose to respawn
-    bool shouldRespawn() const { return m_respawn; }
-
-    // Check if player chose to quit
-    bool shouldQuit() const { return m_quit; }
-
     // Reset for next death
     void reset();
 
@@ -40,9 +34,6 @@ private:
     AudioManager* m_audioManager;
 
     bool m_active;
-    bool m_respawn;
-    bool m_quit;
-
     float m_timer;
     int m_deathCount;
     int m_currentLevel;

@@ -34,6 +34,11 @@ Game::Game()
     , m_gameTime(0.0f)
     , m_totalTime(0.0f)
     , m_corruptionLevel(0)
+    , m_level3HorrorTriggered(false)
+    , m_level5HorrorTriggered(false)
+    , m_level7HorrorTriggered(false)
+    , m_level9HorrorTriggered(false)
+    , m_levelHorrorTimer(0.0f)
     , m_currentLevel(1)
     , m_activeNPC(nullptr)
     , m_deathCount(0)
@@ -268,13 +273,37 @@ void Game::handleEvents() {
                 // Handle game over input
                 if (event.type == SDL_KEYDOWN) {
                     if (event.key.keysym.sym == SDLK_SPACE) {
-                        // Trigger respawn (handled in updateGameOver)
+                        // Respawn player
+                        std::cout << "[Game] Player respawning..." << std::endl;
+
+                        // Reset player
+                        m_player->setPosition(50.0f, 400.0f);
+                        m_player->takeDamage(-100);  // Restore health
+
+                        // Reset level-specific horror triggers
+                        m_level3HorrorTriggered = false;
+                        m_level5HorrorTriggered = false;
+                        m_level7HorrorTriggered = false;
+                        m_level9HorrorTriggered = false;
+                        m_levelHorrorTimer = 0.0f;
+
+                        // Reload level
+                        m_level->loadLevel(m_currentLevel, m_audioManager.get());
+
+                        // Reset game over screen
                         m_gameOverScreen->reset();
-                        m_gameOverScreen->trigger(m_deathCount, m_currentLevel);
+
+                        // Return to playing
+                        setState(GameState::PLAYING);
+
+                        // Resume normal music
+                        m_audioManager->playMusic("level");
                     } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                         // Quit to menu
+                        std::cout << "[Game] Player quit from game over." << std::endl;
                         setState(GameState::MAIN_MENU);
                         m_gameOverScreen->reset();
+                        m_audioManager->playMusic("menu");
                     }
                 }
                 break;
@@ -320,6 +349,9 @@ void Game::update(float deltaTime) {
         case GameState::GAME_OVER:
             updateGameOver(deltaTime);
             break;
+        case GameState::ENDING:
+            updateEnding(deltaTime);
+            break;
         case GameState::CREDITS:
             updateCredits(deltaTime);
             break;
@@ -357,6 +389,9 @@ void Game::render() {
             break;
         case GameState::GAME_OVER:
             renderGameOver();
+            break;
+        case GameState::ENDING:
+            renderEnding();
             break;
         case GameState::CREDITS:
             renderCredits();
@@ -546,69 +581,46 @@ void Game::updatePlaying(float deltaTime) {
     m_pcHorror->update(deltaTime);
     m_pcHorror->updateWindow();
 
-    // PC Horror Triggers (Level-based escalation)
-    static bool level3HorrorTriggered = false;
-    static bool level5HorrorTriggered = false;
-    static bool level7HorrorTriggered = false;
-    static bool level9HorrorTriggered = false;
+    // Update level horror timer
+    m_levelHorrorTimer += deltaTime;
 
+    // PC Horror Triggers (Level-based escalation)
     // Level 3: First PC horror warnings
-    if (m_currentLevel == 3 && !level3HorrorTriggered) {
-        // Wait 10 seconds into level, then trigger
-        static float level3Timer = 0.0f;
-        level3Timer += deltaTime;
-        if (level3Timer > 10.0f) {
-            m_pcHorror->triggerRandomForLevel(3);
-            level3HorrorTriggered = true;
-            std::cout << "💀 LEVEL 3 PC HORROR TRIGGERED!" << std::endl;
-        }
+    if (m_currentLevel == 3 && !m_level3HorrorTriggered && m_levelHorrorTimer > 10.0f) {
+        m_pcHorror->triggerRandomForLevel(3);
+        m_level3HorrorTriggered = true;
+        std::cout << "💀 LEVEL 3 PC HORROR TRIGGERED!" << std::endl;
     }
 
     // Level 5: Escalating PC horror
-    if (m_currentLevel == 5 && !level5HorrorTriggered) {
-        static float level5Timer = 0.0f;
-        level5Timer += deltaTime;
-        if (level5Timer > 15.0f) {
-            // Trigger multiple effects!
-            m_pcHorror->triggerRandomForLevel(5);
-            level5HorrorTriggered = true;
-            std::cout << "🔥 LEVEL 5 PC HORROR TRIGGERED!" << std::endl;
+    if (m_currentLevel == 5 && !m_level5HorrorTriggered && m_levelHorrorTimer > 15.0f) {
+        // Trigger multiple effects!
+        m_pcHorror->triggerRandomForLevel(5);
+        m_level5HorrorTriggered = true;
+        std::cout << "🔥 LEVEL 5 PC HORROR TRIGGERED!" << std::endl;
 
-            // Trigger second effect after 5 seconds
-            static float level5SecondTrigger = 0.0f;
-            level5SecondTrigger += deltaTime;
-            if (level5SecondTrigger > 20.0f) {
-                m_pcHorror->triggerRandomForLevel(5);
-            }
-        }
+        // Trigger second effect immediately
+        m_pcHorror->triggerRandomForLevel(5);
     }
 
     // Level 7: SEVERE PC horror
-    if (m_currentLevel == 7 && !level7HorrorTriggered) {
-        static float level7Timer = 0.0f;
-        level7Timer += deltaTime;
-        if (level7Timer > 8.0f) {
-            // Immediate severe effects
-            m_pcHorror->triggerRandomForLevel(7);
-            level7HorrorTriggered = true;
-            std::cout << "💥 LEVEL 7 SEVERE PC HORROR TRIGGERED!" << std::endl;
+    if (m_currentLevel == 7 && !m_level7HorrorTriggered && m_levelHorrorTimer > 8.0f) {
+        // Immediate severe effects
+        m_pcHorror->triggerRandomForLevel(7);
+        m_level7HorrorTriggered = true;
+        std::cout << "💥 LEVEL 7 SEVERE PC HORROR TRIGGERED!" << std::endl;
 
-            // Chain multiple effects
-            m_pcHorror->triggerEffect(PCHorrorType::WINDOW_CHAOS_EXTREME, 10.0f, 1.0f);
-        }
+        // Chain multiple effects
+        m_pcHorror->triggerEffect(PCHorrorType::WINDOW_CHAOS_EXTREME, 10.0f, 1.0f);
     }
 
     // Level 9: NIGHTMARE PC horror
-    if (m_currentLevel == 9 && !level9HorrorTriggered) {
-        static float level9Timer = 0.0f;
-        level9Timer += deltaTime;
-        if (level9Timer > 5.0f) {
-            // ALL OUT CHAOS
-            m_pcHorror->triggerRandomForLevel(9);
-            m_pcHorror->triggerEffect(PCHorrorType::DESKTOP_TAKEOVER, 15.0f, 1.0f);
-            level9HorrorTriggered = true;
-            std::cout << "☠️ LEVEL 9 NIGHTMARE PC HORROR TRIGGERED!" << std::endl;
-        }
+    if (m_currentLevel == 9 && !m_level9HorrorTriggered && m_levelHorrorTimer > 5.0f) {
+        // ALL OUT CHAOS
+        m_pcHorror->triggerRandomForLevel(9);
+        m_pcHorror->triggerEffect(PCHorrorType::DESKTOP_TAKEOVER, 15.0f, 1.0f);
+        m_level9HorrorTriggered = true;
+        std::cout << "☠️ LEVEL 9 NIGHTMARE PC HORROR TRIGGERED!" << std::endl;
     }
 
     // Nach 30 Sekunden: Erste creepy Dialog-Sequenz
@@ -686,15 +698,25 @@ void Game::updateBossHorror(float deltaTime) {
 }
 
 void Game::updateGameOver(float deltaTime) {
+    // Just update the screen (input handled in handleEvents)
     m_gameOverScreen->update(deltaTime);
 
-    // Check if player chose to respawn
-    if (m_gameOverScreen->shouldRespawn()) {
-        std::cout << "[Game] Player respawning..." << std::endl;
+    // Auto-dismiss after timeout is handled in GameOverScreen::update()
+    // It sets m_active to false and triggers respawn
+    if (!m_gameOverScreen->isActive()) {
+        // Auto-timeout respawn
+        std::cout << "[Game] Auto-respawn after timeout..." << std::endl;
 
         // Reset player
         m_player->setPosition(50.0f, 400.0f);
         m_player->takeDamage(-100);  // Restore health
+
+        // Reset level-specific horror triggers
+        m_level3HorrorTriggered = false;
+        m_level5HorrorTriggered = false;
+        m_level7HorrorTriggered = false;
+        m_level9HorrorTriggered = false;
+        m_levelHorrorTimer = 0.0f;
 
         // Reload level
         m_level->loadLevel(m_currentLevel, m_audioManager.get());
@@ -708,12 +730,16 @@ void Game::updateGameOver(float deltaTime) {
         // Resume normal music
         m_audioManager->playMusic("level");
     }
+}
 
-    // Check if player chose to quit
-    if (m_gameOverScreen->shouldQuit()) {
-        std::cout << "[Game] Player quit from game over." << std::endl;
-        setState(GameState::MAIN_MENU);
-        m_gameOverScreen->reset();
+void Game::updateEnding(float deltaTime) {
+    m_dialogSystem->update(deltaTime);
+
+    // When ending dialog finishes, trigger credits
+    if (!m_dialogSystem->isActive()) {
+        std::cout << "[Game] Ending dialog finished - Starting credits!" << std::endl;
+        m_creditsScreen->start();
+        setState(GameState::CREDITS);
     }
 }
 
@@ -722,8 +748,16 @@ void Game::updateCredits(float deltaTime) {
 
     // Return to main menu when finished
     if (m_creditsScreen->isFinished()) {
+        std::cout << "[Game] Credits finished - Returning to main menu" << std::endl;
         setState(GameState::MAIN_MENU);
         m_creditsScreen->reset();
+
+        // Reset game state for new playthrough
+        m_currentLevel = 1;
+        m_level->loadLevel(m_currentLevel, m_audioManager.get());
+        m_player->setPosition(50.0f, 400.0f);
+        m_collectedCodeFragments.clear();
+
         m_audioManager->playMusic("menu");
     }
 }
@@ -878,6 +912,15 @@ void Game::renderGameOver() {
 
     // Game over screen on top
     m_gameOverScreen->render(m_renderer);
+}
+
+void Game::renderEnding() {
+    // Render game in background
+    m_level->render(m_renderer);
+    m_player->render(m_renderer);
+
+    // Dialog overlay
+    m_dialogSystem->render(m_renderer);
 }
 
 void Game::renderCredits() {
@@ -1095,6 +1138,13 @@ void Game::checkGoalPortal() {
 void Game::advanceToNextLevel() {
     m_currentLevel++;
 
+    // Reset level-specific horror triggers
+    m_level3HorrorTriggered = false;
+    m_level5HorrorTriggered = false;
+    m_level7HorrorTriggered = false;
+    m_level9HorrorTriggered = false;
+    m_levelHorrorTimer = 0.0f;
+
     std::cout << "========================================" << std::endl;
     std::cout << "  ADVANCING TO LEVEL " << m_currentLevel << std::endl;
     std::cout << "========================================" << std::endl;
@@ -1139,12 +1189,9 @@ void Game::advanceToNextLevel() {
         }
 
         m_dialogSystem->start();
-        setState(GameState::DIALOG);
+        setState(GameState::ENDING);
 
-        // Reset to level 1 after completing
-        m_currentLevel = 1;
-        m_level->loadLevel(m_currentLevel, m_audioManager.get());
-        m_player->setPosition(50.0f, 400.0f);
+        // Note: Level reset happens after ending dialog finishes
     } else {
         // Load next level
         m_level->loadLevel(m_currentLevel, m_audioManager.get());
