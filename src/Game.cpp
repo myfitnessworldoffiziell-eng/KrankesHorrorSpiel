@@ -7,6 +7,7 @@
 #include "AudioManager.h"
 #include "UIHelper.h"
 #include "MainMenu.h"
+#include "SettingsMenu.h"
 #include "PauseMenu.h"
 #include "DialogSystem.h"
 #include "FakeBlueScreen.h"
@@ -118,6 +119,7 @@ bool Game::initialize() {
     m_player->setAudioManager(m_audioManager.get());  // Connect audio to player
     m_level = std::make_unique<Level>();
     m_mainMenu = std::make_unique<MainMenu>();
+    m_settingsMenu = std::make_unique<SettingsMenu>(m_audioManager.get());
     m_pauseMenu = std::make_unique<PauseMenu>();
     m_dialogSystem = std::make_unique<DialogSystem>();
     m_gameOverScreen = std::make_unique<GameOverScreen>(m_audioManager.get());
@@ -205,6 +207,13 @@ void Game::handleEvents() {
         switch (m_currentState) {
             case GameState::MAIN_MENU:
                 m_mainMenu->handleInput(event);
+                break;
+
+            case GameState::SETTINGS:
+                m_settingsMenu->handleInput(event);
+                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+                    setState(GameState::MAIN_MENU);
+                }
                 break;
 
             case GameState::PLAYING:
@@ -341,6 +350,9 @@ void Game::update(float deltaTime) {
         case GameState::MAIN_MENU:
             updateMainMenu(deltaTime);
             break;
+        case GameState::SETTINGS:
+            updateSettings(deltaTime);
+            break;
         case GameState::PLAYING:
             updatePlaying(deltaTime);
             break;
@@ -379,6 +391,9 @@ void Game::render() {
     switch (m_currentState) {
         case GameState::MAIN_MENU:
             renderMainMenu();
+            break;
+        case GameState::SETTINGS:
+            renderSettings();
             break;
         case GameState::PLAYING:
             renderPlaying();
@@ -422,8 +437,7 @@ void Game::updateMainMenu(float deltaTime) {
             setState(GameState::PLAYING);
             break;
         case MainMenu::MenuResult::SETTINGS:
-            // TODO: Settings menu
-            std::cout << "[Game] Settings not implemented yet" << std::endl;
+            setState(GameState::SETTINGS);
             break;
         case MainMenu::MenuResult::QUIT:
             m_isRunning = false;
@@ -431,6 +445,22 @@ void Game::updateMainMenu(float deltaTime) {
         default:
             break;
     }
+}
+
+void Game::updateSettings(float deltaTime) {
+    m_settingsMenu->update(deltaTime);
+
+    // Apply settings changes
+    // Fullscreen setting
+    bool newFullscreen = m_settingsMenu->isFullscreen();
+    if (newFullscreen != m_isFullscreen) {
+        m_isFullscreen = newFullscreen;
+        SDL_SetWindowFullscreen(m_window, m_isFullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+        std::cout << "[Game] Fullscreen: " << (m_isFullscreen ? "ON" : "OFF") << std::endl;
+    }
+
+    // Resolution changes would require window recreation (not implemented in this session)
+    // Music and SFX volumes are handled automatically by SettingsMenu -> AudioManager
 }
 
 void Game::updatePlaying(float deltaTime) {
@@ -708,6 +738,9 @@ void Game::updatePaused(float deltaTime) {
         case PauseMenu::PauseResult::RESUME:
             setState(GameState::PLAYING);
             break;
+        case PauseMenu::PauseResult::SETTINGS:
+            setState(GameState::SETTINGS);
+            break;
         case PauseMenu::PauseResult::MAIN_MENU:
             setState(GameState::MAIN_MENU);
             break;
@@ -818,6 +851,10 @@ void Game::updateCredits(float deltaTime) {
 
 void Game::renderMainMenu() {
     m_mainMenu->render(m_renderer);
+}
+
+void Game::renderSettings() {
+    m_settingsMenu->render(m_renderer);
 }
 
 void Game::renderPlaying() {
@@ -991,6 +1028,7 @@ void Game::setState(GameState newState) {
     switch (m_currentState) {
         case GameState::INTRO: std::cout << "INTRO"; break;
         case GameState::MAIN_MENU: std::cout << "MAIN_MENU"; break;
+        case GameState::SETTINGS: std::cout << "SETTINGS"; break;
         case GameState::PLAYING: std::cout << "PLAYING"; break;
         case GameState::PAUSED: std::cout << "PAUSED"; break;
         case GameState::DIALOG: std::cout << "DIALOG"; break;
@@ -1005,6 +1043,7 @@ void Game::setState(GameState newState) {
     switch (newState) {
         case GameState::INTRO: std::cout << "INTRO"; break;
         case GameState::MAIN_MENU: std::cout << "MAIN_MENU"; break;
+        case GameState::SETTINGS: std::cout << "SETTINGS"; break;
         case GameState::PLAYING: std::cout << "PLAYING"; break;
         case GameState::PAUSED: std::cout << "PAUSED"; break;
         case GameState::DIALOG: std::cout << "DIALOG"; break;

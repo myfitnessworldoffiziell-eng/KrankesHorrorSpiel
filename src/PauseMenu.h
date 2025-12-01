@@ -13,6 +13,7 @@ public:
     enum class PauseResult {
         NONE,
         RESUME,
+        SETTINGS,
         MAIN_MENU,
         QUIT
     };

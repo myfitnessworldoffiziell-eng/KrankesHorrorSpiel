@@ -9,17 +9,22 @@ PauseMenu::PauseMenu()
 {
     // Create buttons
     UIHelper::Button resumeButton;
-    resumeButton.rect = {300, 220, 200, 50};
+    resumeButton.rect = {300, 200, 200, 50};
     resumeButton.text = "RESUME";
     m_buttons.push_back(resumeButton);
 
+    UIHelper::Button settingsButton;
+    settingsButton.rect = {300, 265, 200, 50};
+    settingsButton.text = "SETTINGS";
+    m_buttons.push_back(settingsButton);
+
     UIHelper::Button mainMenuButton;
-    mainMenuButton.rect = {300, 290, 200, 50};
+    mainMenuButton.rect = {300, 330, 200, 50};
     mainMenuButton.text = "MAIN MENU";
     m_buttons.push_back(mainMenuButton);
 
     UIHelper::Button quitButton;
-    quitButton.rect = {300, 360, 200, 50};
+    quitButton.rect = {300, 395, 200, 50};
     quitButton.text = "QUIT";
     m_buttons.push_back(quitButton);
 }
@@ -46,11 +51,16 @@ PauseMenu::PauseResult PauseMenu::update(float deltaTime) {
     }
 
     if (UIHelper::renderButton(nullptr, m_buttons[1], m_mouseX, m_mouseY, m_mouseClicked)) {
+        std::cout << "[PauseMenu] SETTINGS clicked" << std::endl;
+        m_result = PauseResult::SETTINGS;
+    }
+
+    if (UIHelper::renderButton(nullptr, m_buttons[2], m_mouseX, m_mouseY, m_mouseClicked)) {
         std::cout << "[PauseMenu] MAIN MENU clicked" << std::endl;
         m_result = PauseResult::MAIN_MENU;
     }
 
-    if (UIHelper::renderButton(nullptr, m_buttons[2], m_mouseX, m_mouseY, m_mouseClicked)) {
+    if (UIHelper::renderButton(nullptr, m_buttons[3], m_mouseX, m_mouseY, m_mouseClicked)) {
         std::cout << "[PauseMenu] QUIT clicked" << std::endl;
         m_result = PauseResult::QUIT;
     }
