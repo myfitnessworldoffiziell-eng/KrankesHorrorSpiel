@@ -48,6 +48,7 @@ set(SOURCES
     src/EchoPrime.cpp
     src/BossDefeatHorror.cpp
     src/PCHorror.cpp
+    src/ExtremePCHorror.cpp
     src/GameOverScreen.cpp
     src/CreditsScreen.cpp
 )
@@ -74,6 +75,7 @@ set(HEADERS
     src/EchoPrime.h
     src/BossDefeatHorror.h
     src/PCHorror.h
+    src/ExtremePCHorror.h
     src/GameOverScreen.h
     src/CreditsScreen.h
 )

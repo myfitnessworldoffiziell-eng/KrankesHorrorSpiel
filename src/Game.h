@@ -23,6 +23,7 @@ class JumpscareSystem;
 class BossDefeatHorror;
 class NPC;
 class PCHorror;
+class ExtremePCHorror;
 class GameOverScreen;
 class CreditsScreen;
 
@@ -120,6 +121,7 @@ private:
     std::unique_ptr<JumpscareSystem> m_jumpscareSystem;
     std::unique_ptr<BossDefeatHorror> m_bossDefeatHorror;
     std::unique_ptr<PCHorror> m_pcHorror;
+    std::unique_ptr<ExtremePCHorror> m_extremePCHorror;
 
     // Game Timers
     Uint32 m_lastFrameTime;
@@ -135,6 +137,12 @@ private:
     bool m_level7HorrorTriggered;
     bool m_level9HorrorTriggered;
     float m_levelHorrorTimer; // Timer since level start for horror triggers
+
+    // Extreme horror tracking (per level)
+    bool m_level4ExtremeTriggered;
+    bool m_level6ExtremeTriggered;
+    bool m_level8ExtremeTriggered;
+    bool m_level10ExtremeTriggered;
 
     // Level Progression
     int m_currentLevel; // Current level number (1-10)

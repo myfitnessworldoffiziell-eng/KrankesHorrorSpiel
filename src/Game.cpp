@@ -17,6 +17,7 @@
 #include "EchoPrime.h"
 #include "BossDefeatHorror.h"
 #include "PCHorror.h"
+#include "ExtremePCHorror.h"
 #include "GameOverScreen.h"
 #include "CreditsScreen.h"
 #include <iostream>
@@ -39,6 +40,10 @@ Game::Game()
     , m_level7HorrorTriggered(false)
     , m_level9HorrorTriggered(false)
     , m_levelHorrorTimer(0.0f)
+    , m_level4ExtremeTriggered(false)
+    , m_level6ExtremeTriggered(false)
+    , m_level8ExtremeTriggered(false)
+    , m_level10ExtremeTriggered(false)
     , m_currentLevel(1)
     , m_activeNPC(nullptr)
     , m_deathCount(0)
@@ -121,6 +126,7 @@ bool Game::initialize() {
     m_jumpscareSystem = std::make_unique<JumpscareSystem>(m_audioManager.get());
     m_bossDefeatHorror = std::make_unique<BossDefeatHorror>(m_audioManager.get(), m_permissionManager.get());
     m_pcHorror = std::make_unique<PCHorror>(m_window, m_audioManager.get(), m_metaHorror.get());
+    m_extremePCHorror = std::make_unique<ExtremePCHorror>(m_window, m_audioManager.get(), m_metaHorror.get());
 
     // Meta-Horror initialisieren (erstellt erste Dateien)
     m_metaHorror->initialize();
@@ -285,6 +291,10 @@ void Game::handleEvents() {
                         m_level5HorrorTriggered = false;
                         m_level7HorrorTriggered = false;
                         m_level9HorrorTriggered = false;
+                        m_level4ExtremeTriggered = false;
+                        m_level6ExtremeTriggered = false;
+                        m_level8ExtremeTriggered = false;
+                        m_level10ExtremeTriggered = false;
                         m_levelHorrorTimer = 0.0f;
 
                         // Reload level
@@ -623,6 +633,46 @@ void Game::updatePlaying(float deltaTime) {
         std::cout << "☠️ LEVEL 9 NIGHTMARE PC HORROR TRIGGERED!" << std::endl;
     }
 
+    // ===== EXTREME PC HORROR TRIGGERS =====
+    // Update extreme horror system
+    m_extremePCHorror->update(deltaTime);
+    m_extremePCHorror->updateWindow();
+
+    // Level 4: First EXTREME horror (Fake Not Responding)
+    if (m_currentLevel == 4 && !m_level4ExtremeTriggered && m_levelHorrorTimer > 12.0f) {
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::FAKE_NOT_RESPONDING, 8.0f, 1.0f);
+        m_level4ExtremeTriggered = true;
+        std::cout << "🔥 LEVEL 4 EXTREME HORROR: Fake Not Responding!" << std::endl;
+    }
+
+    // Level 6: BOSS LEVEL - Multiple Windows Horror
+    if (m_currentLevel == 6 && !m_level6ExtremeTriggered && m_levelHorrorTimer > 20.0f) {
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::MULTIPLE_WINDOWS, 15.0f, 1.0f);
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::WINDOW_TITLE_HORROR, 20.0f, 1.0f);
+        m_level6ExtremeTriggered = true;
+        std::cout << "💀 LEVEL 6 EXTREME HORROR: Multiple Windows!" << std::endl;
+    }
+
+    // Level 8: SECOND BOSS - Surveillance Horror
+    if (m_currentLevel == 8 && !m_level8ExtremeTriggered && m_levelHorrorTimer > 15.0f) {
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::FAKE_WEBCAM_FEED, 20.0f, 1.0f);
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::FAKE_AUDIO_RECORDING, 18.0f, 1.0f);
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::FAKE_SCREEN_RECORDING, 25.0f, 1.0f);
+        m_level8ExtremeTriggered = true;
+        std::cout << "📹 LEVEL 8 EXTREME HORROR: Total Surveillance!" << std::endl;
+    }
+
+    // Level 10: FINAL BOSS - ALL EXTREME HORROR!
+    if (m_currentLevel == 10 && !m_level10ExtremeTriggered && m_levelHorrorTimer > 10.0f) {
+        // EVERYTHING AT ONCE!
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::FAKE_BROWSER_SEARCH, 30.0f, 1.0f);
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::UNSTOPPABLE_GAME, 25.0f, 1.0f);
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::FAKE_FILE_EXPLORER, 20.0f, 1.0f);
+        m_extremePCHorror->triggerEffect(ExtremePCHorrorType::WALLPAPER_HORROR, 15.0f, 1.0f);
+        m_level10ExtremeTriggered = true;
+        std::cout << "☠️💀🔥 LEVEL 10 ULTIMATE EXTREME HORROR: EVERYTHING!" << std::endl;
+    }
+
     // Nach 30 Sekunden: Erste creepy Dialog-Sequenz
     static bool firstDialogShown = false;
     if (m_gameTime > 30.0f && !firstDialogShown && !m_dialogSystem->isActive()) {
@@ -716,6 +766,10 @@ void Game::updateGameOver(float deltaTime) {
         m_level5HorrorTriggered = false;
         m_level7HorrorTriggered = false;
         m_level9HorrorTriggered = false;
+        m_level4ExtremeTriggered = false;
+        m_level6ExtremeTriggered = false;
+        m_level8ExtremeTriggered = false;
+        m_level10ExtremeTriggered = false;
         m_levelHorrorTimer = 0.0f;
 
         // Reload level
@@ -882,6 +936,9 @@ void Game::renderPlaying() {
 
     // PC Horror Effects (EXTREME overlays)
     m_pcHorror->render(m_renderer);
+
+    // EXTREME PC Horror Effects (MAXIMUM HORROR)
+    m_extremePCHorror->render(m_renderer);
 }
 
 void Game::renderPaused() {
@@ -1144,6 +1201,12 @@ void Game::advanceToNextLevel() {
     m_level7HorrorTriggered = false;
     m_level9HorrorTriggered = false;
     m_levelHorrorTimer = 0.0f;
+
+    // Reset extreme horror triggers
+    m_level4ExtremeTriggered = false;
+    m_level6ExtremeTriggered = false;
+    m_level8ExtremeTriggered = false;
+    m_level10ExtremeTriggered = false;
 
     std::cout << "========================================" << std::endl;
     std::cout << "  ADVANCING TO LEVEL " << m_currentLevel << std::endl;
