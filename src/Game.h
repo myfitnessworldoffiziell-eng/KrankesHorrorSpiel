@@ -15,6 +15,7 @@ class CorruptionSystem;
 class Player;
 class Level;
 class AudioManager;
+class TextureManager;
 class MainMenu;
 class PauseMenu;
 class DialogSystem;
@@ -104,6 +105,7 @@ private:
     std::unique_ptr<PermissionManager> m_permissionManager;
     std::unique_ptr<CorruptionSystem> m_corruptionSystem;
     std::unique_ptr<AudioManager> m_audioManager;
+    std::unique_ptr<TextureManager> m_textureManager;
 
     // Gameplay
     std::unique_ptr<Player> m_player;

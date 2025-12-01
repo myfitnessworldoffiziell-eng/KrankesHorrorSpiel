@@ -51,6 +51,8 @@ set(SOURCES
     src/ExtremePCHorror.cpp
     src/GameOverScreen.cpp
     src/CreditsScreen.cpp
+    src/TextureManager.cpp
+    src/ProceduralSpriteGenerator.cpp
 )
 
 set(HEADERS
@@ -78,6 +80,8 @@ set(HEADERS
     src/ExtremePCHorror.h
     src/GameOverScreen.h
     src/CreditsScreen.h
+    src/TextureManager.h
+    src/ProceduralSpriteGenerator.h
 )
 
 # Executable
