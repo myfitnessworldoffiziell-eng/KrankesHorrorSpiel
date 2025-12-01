@@ -7,6 +7,7 @@
 enum class GameState {
     INTRO,          // Disclaimer & Logo
     MAIN_MENU,      // Hauptmenü
+    SETTINGS,       // Settings menu
     PLAYING,        // Aktives Gameplay
     PAUSED,         // Pause-Menü
     DIALOG,         // Dialog/Cutscene läuft

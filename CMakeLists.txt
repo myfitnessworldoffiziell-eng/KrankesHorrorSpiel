@@ -37,6 +37,7 @@ set(SOURCES
     src/AudioManager.cpp
     src/UIHelper.cpp
     src/MainMenu.cpp
+    src/SettingsMenu.cpp
     src/PauseMenu.cpp
     src/DialogSystem.cpp
     src/FakeBlueScreen.cpp
@@ -66,6 +67,7 @@ set(HEADERS
     src/AudioManager.h
     src/UIHelper.h
     src/MainMenu.h
+    src/SettingsMenu.h
     src/PauseMenu.h
     src/DialogSystem.h
     src/FakeBlueScreen.h

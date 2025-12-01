@@ -17,6 +17,7 @@ class Level;
 class AudioManager;
 class TextureManager;
 class MainMenu;
+class SettingsMenu;
 class PauseMenu;
 class DialogSystem;
 class FakeBlueScreen;
@@ -70,6 +71,7 @@ private:
 
     // State-specific methods
     void updateMainMenu(float deltaTime);
+    void updateSettings(float deltaTime);
     void updatePlaying(float deltaTime);
     void updatePaused(float deltaTime);
     void updateDialog(float deltaTime);
@@ -80,6 +82,7 @@ private:
     void updateCredits(float deltaTime);
 
     void renderMainMenu();
+    void renderSettings();
     void renderPlaying();
     void renderPaused();
     void renderDialog();
@@ -113,6 +116,7 @@ private:
 
     // UI & Menus
     std::unique_ptr<MainMenu> m_mainMenu;
+    std::unique_ptr<SettingsMenu> m_settingsMenu;
     std::unique_ptr<PauseMenu> m_pauseMenu;
     std::unique_ptr<DialogSystem> m_dialogSystem;
     std::unique_ptr<GameOverScreen> m_gameOverScreen;
