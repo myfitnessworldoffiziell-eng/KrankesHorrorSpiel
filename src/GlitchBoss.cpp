@@ -1,6 +1,7 @@
 #include "GlitchBoss.h"
 #include "Player.h"
 #include "AudioManager.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
