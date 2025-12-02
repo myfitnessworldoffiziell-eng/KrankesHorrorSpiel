@@ -1,5 +1,5 @@
+#include "SDL_Platform.h"
 #include "PermissionManager.h"
-#include <SDL2/SDL.h>
 #include <iostream>
 
 PermissionManager::PermissionManager()

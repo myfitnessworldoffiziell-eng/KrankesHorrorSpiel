@@ -1,6 +1,6 @@
+#include "SDL_Platform.h"
 #include "Player.h"
 #include "AudioManager.h"
-#include <SDL2/SDL.h>
 #include <algorithm>
 
 Player::Player()

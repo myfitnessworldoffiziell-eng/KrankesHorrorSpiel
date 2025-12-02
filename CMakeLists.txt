@@ -57,6 +57,7 @@ set(SOURCES
 )
 
 set(HEADERS
+    src/SDL_Platform.h
     src/Game.h
     src/GameState.h
     src/MetaHorror.h

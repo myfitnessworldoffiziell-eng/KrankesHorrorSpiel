@@ -1,6 +1,6 @@
 #pragma once
+#include "SDL_Platform.h"
 
-#include <SDL2/SDL.h>
 #include "AudioManager.h"
 #include <string>
 #include <vector>

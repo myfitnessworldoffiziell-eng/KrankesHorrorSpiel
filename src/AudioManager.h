@@ -1,6 +1,6 @@
 #pragma once
+#include "SDL_Platform.h"
 
-#include <SDL2/SDL_mixer.h>
 #include <string>
 #include <unordered_map>
 #include <memory>

@@ -6,6 +6,7 @@
 #include "EchoPrime.h"
 #include "Player.h"
 #include "AudioManager.h"
+#include <algorithm>
 
 Level::Level()
     : m_levelNumber(0)

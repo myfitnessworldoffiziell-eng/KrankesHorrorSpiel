@@ -1,6 +1,6 @@
 #pragma once
+#include "SDL_Platform.h"
 
-#include <SDL2/SDL.h>
 #include <vector>
 #include <memory>
 #include <string>
