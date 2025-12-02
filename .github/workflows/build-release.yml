@@ -1,0 +1,169 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggert bei Version-Tags (z.B. v1.0.0)
+  workflow_dispatch:  # Erlaubt manuelles Triggern
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: 'c8696863d371ab7f46e213d8f5ca923c4aef2a00'
+
+      - name: Install dependencies
+        run: |
+          vcpkg install sdl2:x64-windows sdl2-image:x64-windows sdl2-mixer:x64-windows sdl2-ttf:x64-windows
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build --config Release
+
+      - name: Package Windows
+        run: |
+          mkdir ECHOES-Windows
+          copy build\Release\ECHOES.exe ECHOES-Windows\
+          xcopy assets ECHOES-Windows\assets\ /E /I
+          copy README.md ECHOES-Windows\ 2>nul || echo No README
+          copy INSTALL_GUIDE.md ECHOES-Windows\ 2>nul || echo No INSTALL_GUIDE
+
+      - name: Create ZIP
+        run: |
+          Compress-Archive -Path ECHOES-Windows\* -DestinationPath ECHOES-Windows-x64.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECHOES-Windows-x64
+          path: ECHOES-Windows-x64.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build -j$(nproc)
+
+      - name: Package Linux
+        run: |
+          mkdir -p ECHOES-Linux
+          cp build/ECHOES ECHOES-Linux/
+          cp -r assets ECHOES-Linux/
+          cp README.md ECHOES-Linux/ 2>/dev/null || true
+          cp INSTALL_GUIDE.md ECHOES-Linux/ 2>/dev/null || true
+          tar -czf ECHOES-Linux-x64.tar.gz ECHOES-Linux/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECHOES-Linux-x64
+          path: ECHOES-Linux-x64.tar.gz
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install cmake sdl2 sdl2_image sdl2_mixer sdl2_ttf
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cmake --build build -j$(sysctl -n hw.ncpu)
+
+      - name: Package macOS
+        run: |
+          mkdir -p ECHOES-macOS
+          cp build/ECHOES ECHOES-macOS/
+          cp -r assets ECHOES-macOS/
+          cp README.md ECHOES-macOS/ 2>/dev/null || true
+          cp INSTALL_GUIDE.md ECHOES-macOS/ 2>/dev/null || true
+          tar -czf ECHOES-macOS-x64.tar.gz ECHOES-macOS/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECHOES-macOS-x64
+          path: ECHOES-macOS-x64.tar.gz
+
+  create-release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ECHOES-Windows-x64/ECHOES-Windows-x64.zip
+            ECHOES-Linux-x64/ECHOES-Linux-x64.tar.gz
+            ECHOES-macOS-x64/ECHOES-macOS-x64.tar.gz
+          body: |
+            # 🎮 ECHOES.exe - Horror Platformer Release
+
+            ## 📥 Download für dein System:
+
+            ### Windows (64-bit)
+            - `ECHOES-Windows-x64.zip` herunterladen
+            - Entpacken
+            - `ECHOES.exe` doppelklicken
+
+            ### Linux (64-bit)
+            - `ECHOES-Linux-x64.tar.gz` herunterladen
+            - Entpacken: `tar -xzf ECHOES-Linux-x64.tar.gz`
+            - Ausführen: `./ECHOES-Linux/ECHOES`
+
+            ### macOS (64-bit)
+            - `ECHOES-macOS-x64.tar.gz` herunterladen
+            - Entpacken: `tar -xzf ECHOES-macOS-x64.tar.gz`
+            - Ausführen: `./ECHOES-macOS/ECHOES`
+
+            ## 🎮 Steuerung:
+            - **Bewegen**: A/D oder ←/→
+            - **Springen**: SPACE oder ↑
+            - **Pause**: ESC
+
+            ## ⚠️ Horror-Warnung:
+            Dieses Spiel enthält:
+            - Jumpscares
+            - Glitch-Effekte
+            - Horror-Atmosphäre
+            - Extreme PC-Effekte (ab höheren Leveln)
+
+            Viel Spaß! 👻
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
