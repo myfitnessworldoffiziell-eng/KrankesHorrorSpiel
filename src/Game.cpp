@@ -6,6 +6,7 @@
 #include "Level.h"
 #include "Enemy.h"
 #include "AudioManager.h"
+#include "TextureManager.h"
 #include "UIHelper.h"
 #include "MainMenu.h"
 #include "SettingsMenu.h"
