@@ -1,6 +1,7 @@
 #include "FakeBlueScreen.h"
 #include "UIHelper.h"
 #include <iostream>
+#include <sstream>
 
 FakeBlueScreen::FakeBlueScreen()
     : m_active(false)

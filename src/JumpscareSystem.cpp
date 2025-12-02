@@ -102,11 +102,13 @@ void JumpscareSystem::render(SDL_Renderer* renderer) {
 
     switch (m_currentType) {
         case ScareType::FLASH:
-            // White flash
-            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, m_flashAlpha);
-            SDL_Rect fullScreen = {0, 0, 800, 600};
-            SDL_RenderFillRect(renderer, &fullScreen);
+            {
+                // White flash
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, m_flashAlpha);
+                SDL_Rect fullScreen = {0, 0, 800, 600};
+                SDL_RenderFillRect(renderer, &fullScreen);
+            }
             break;
 
         case ScareType::SCREAMER_IMAGE:

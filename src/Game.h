@@ -6,6 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <memory>
 #include <string>
+#include <vector>
 #include "GameState.h"
 
 // Forward declarations

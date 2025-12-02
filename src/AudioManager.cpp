@@ -3,6 +3,7 @@
 
 AudioManager::AudioManager()
     : m_musicVolume(64)
+    , m_sfxVolume(64)
     , m_initialized(false)
     , m_distortionLevel(0.0f)
 {
@@ -129,8 +130,16 @@ void AudioManager::playSound(const std::string& id, int volume) {
         return;
     }
 
-    Mix_VolumeChunk(it->second, volume);
+    // Apply global SFX volume
+    int adjustedVolume = (volume * m_sfxVolume) / 128;
+    Mix_VolumeChunk(it->second, adjustedVolume);
     Mix_PlayChannel(-1, it->second, 0);
+}
+
+void AudioManager::setSFXVolume(int volume) {
+    m_sfxVolume = volume;
+    if (m_sfxVolume < 0) m_sfxVolume = 0;
+    if (m_sfxVolume > 128) m_sfxVolume = 128;
 }
 
 void AudioManager::distortMusic(float amount) {

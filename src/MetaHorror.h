@@ -29,6 +29,7 @@ public:
 
     // Manuelle Trigger
     void createCreepyFile();
+    void createFile(const std::string& name, const std::string& content); // General file creation
     void manipulateWindow(SDL_Window* window);
 
 private:

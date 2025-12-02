@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <memory>
+#include <string>
 
 class Enemy;
 class NPC;
@@ -53,6 +54,9 @@ public:
         float x, y;
         std::string code;  // Part of the code: "F I R", "S T", "E N D"
         bool collected;
+
+        CodeFragment(float _x, float _y, std::string _code, bool _collected)
+            : x(_x), y(_y), code(_code), collected(_collected) {}
     };
     const std::vector<CodeFragment>& getCodeFragments() const { return m_codeFragments; }
     std::vector<CodeFragment>& getCodeFragments() { return m_codeFragments; }

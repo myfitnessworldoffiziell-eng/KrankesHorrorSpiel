@@ -29,6 +29,7 @@ public:
     // Sound Effects
     bool loadSound(const std::string& id, const std::string& filepath);
     void playSound(const std::string& id, int volume = 128);
+    void setSFXVolume(int volume); // 0-128
 
     // Horror-specific
     void distortMusic(float amount); // 0.0 - 1.0
@@ -44,6 +45,7 @@ private:
 
     std::string m_currentMusicId;
     int m_musicVolume;
+    int m_sfxVolume;
     bool m_initialized;
 
     // Corruption state

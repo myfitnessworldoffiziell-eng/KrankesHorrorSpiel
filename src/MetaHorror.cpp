@@ -136,6 +136,11 @@ void MetaHorror::createCreepyFile() {
     std::cout << "[MetaHorror] Creepy file created (" << m_filesCreated << " total)" << std::endl;
 }
 
+void MetaHorror::createFile(const std::string& name, const std::string& content) {
+    // General file creation - creates in Downloads folder
+    createDownloadsFile(name, content);
+}
+
 void MetaHorror::manipulateWindow(SDL_Window* window) {
     if (!window) return;
 

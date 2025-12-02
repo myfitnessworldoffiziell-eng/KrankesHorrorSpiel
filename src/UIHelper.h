@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 /**
  * UIHelper
@@ -18,6 +19,11 @@ public:
     static void renderText(SDL_Renderer* renderer, const std::string& text,
                           int x, int y, SDL_Color color,
                           int fontSize = 24, bool centered = false);
+
+    // Überladene Version mit RGB-Werten
+    static void renderText(SDL_Renderer* renderer, const std::string& text,
+                          int x, int y, int fontSize,
+                          int r, int g, int b);
 
     // Button Rendering
     struct Button {

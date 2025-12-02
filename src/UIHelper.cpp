@@ -83,6 +83,14 @@ void UIHelper::renderText(SDL_Renderer* renderer, const std::string& text,
     SDL_FreeSurface(surface);
 }
 
+// Überladene Version mit RGB-Werten
+void UIHelper::renderText(SDL_Renderer* renderer, const std::string& text,
+                         int x, int y, int fontSize,
+                         int r, int g, int b) {
+    SDL_Color color = {static_cast<Uint8>(r), static_cast<Uint8>(g), static_cast<Uint8>(b), 255};
+    renderText(renderer, text, x, y, color, fontSize, false);
+}
+
 bool UIHelper::renderButton(SDL_Renderer* renderer, Button& button,
                             int mouseX, int mouseY, bool mouseClicked) {
     // Check hover
