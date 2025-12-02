@@ -97,6 +97,7 @@ target_include_directories(ECHOES PRIVATE
 
 # Link Libraries
 target_link_libraries(ECHOES PRIVATE
+    SDL2::SDL2main
     SDL2::SDL2
     SDL2_image::SDL2_image
     SDL2_mixer::SDL2_mixer
