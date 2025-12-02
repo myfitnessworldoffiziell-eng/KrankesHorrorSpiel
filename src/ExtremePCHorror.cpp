@@ -470,7 +470,7 @@ void ExtremePCHorror::renderFakeWebcamFeed(SDL_Renderer* renderer, ExtremePCHorr
 
     // Timer
     int seconds = static_cast<int>(effect->timer);
-    std::string timeText = "00:" + (seconds < 10 ? "0" : "") + std::to_string(seconds);
+    std::string timeText = std::string("00:") + (seconds < 10 ? "0" : "") + std::to_string(seconds);
     UIHelper::renderText(renderer, timeText, 670, 175, 12, 255, 255, 255);
 }
 

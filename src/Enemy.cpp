@@ -288,8 +288,8 @@ void GlitchSlime::render(SDL_Renderer* renderer) {
 // SPIKE BALL
 // ============================================
 
-SpikeBall::SpikeBall(float x, float y)
-    : Enemy(Type::SPIKE_BALL, x, y, nullptr)
+SpikeBall::SpikeBall(float x, float y, AudioManager* audioManager)
+    : Enemy(Type::SPIKE_BALL, x, y, audioManager)
     , m_rotation(0.0f)
 {
     m_width = 40.0f;

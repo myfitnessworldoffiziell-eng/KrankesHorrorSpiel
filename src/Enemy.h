@@ -110,7 +110,7 @@ private:
  */
 class SpikeBall : public Enemy {
 public:
-    SpikeBall(float x, float y);
+    SpikeBall(float x, float y, AudioManager* audioManager);
 
     void update(float deltaTime) override;
     void render(SDL_Renderer* renderer) override;

@@ -4,6 +4,7 @@
 #include "CorruptionSystem.h"
 #include "Player.h"
 #include "Level.h"
+#include "Enemy.h"
 #include "AudioManager.h"
 #include "UIHelper.h"
 #include "MainMenu.h"

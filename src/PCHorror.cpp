@@ -661,7 +661,7 @@ void PCHorror::renderWebcamAccess(SDL_Renderer* renderer, PCHorrorEffect* effect
     UIHelper::renderText(renderer, "Camera: ON", 20, 50, 12, 255, 255, 255);
 
     int seconds = static_cast<int>(effect->timer);
-    std::string timeText = "00:" + (seconds < 10 ? "0" : "") + std::to_string(seconds);
+    std::string timeText = std::string("00:") + (seconds < 10 ? "0" : "") + std::to_string(seconds);
     UIHelper::renderText(renderer, timeText, 20, 70, 12, 255, 255, 255);
 }
 
