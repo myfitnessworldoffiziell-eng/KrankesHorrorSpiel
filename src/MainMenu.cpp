@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 MainMenu::MainMenu()
     : m_result(MenuResult::NONE)

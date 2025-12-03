@@ -97,7 +97,7 @@ void Level::render(SDL_Renderer* renderer) {
 
         // Color based on decoration type and variant
         switch (deco.type) {
-            case DecorationType::TREE:
+            case DecorationType::TREE: {
                 // Brown trunk + green foliage
                 SDL_SetRenderDrawColor(renderer, 101, 67, 33, 255);
                 SDL_Rect trunk = {rect.x + rect.w/2 - 5, rect.y + rect.h/2, 10, rect.h/2};
@@ -106,6 +106,7 @@ void Level::render(SDL_Renderer* renderer) {
                 SDL_Rect foliage = {rect.x, rect.y, rect.w, rect.h/2};
                 SDL_RenderFillRect(renderer, &foliage);
                 break;
+            }
 
             case DecorationType::ROCK:
                 SDL_SetRenderDrawColor(renderer, 105 + deco.colorVariant*15, 105 + deco.colorVariant*15, 105 + deco.colorVariant*15, 255);
@@ -131,7 +132,7 @@ void Level::render(SDL_Renderer* renderer) {
                 }
                 break;
 
-            case DecorationType::FLOWER:
+            case DecorationType::FLOWER: {
                 // Stem
                 SDL_SetRenderDrawColor(renderer, 0, 128, 0, 255);
                 SDL_RenderDrawLine(renderer, rect.x + rect.w/2, rect.y + rect.h, rect.x + rect.w/2, rect.y + 5);
@@ -140,6 +141,7 @@ void Level::render(SDL_Renderer* renderer) {
                 SDL_Rect bloom = {rect.x, rect.y, rect.w, 5};
                 SDL_RenderFillRect(renderer, &bloom);
                 break;
+            }
 
             case DecorationType::STONE_PILE:
                 SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
@@ -159,7 +161,7 @@ void Level::render(SDL_Renderer* renderer) {
                 SDL_RenderDrawLine(renderer, rect.x, rect.y + rect.h - 5, rect.x + rect.w, rect.y + rect.h - 5);
                 break;
 
-            case DecorationType::SIGN_POST:
+            case DecorationType::SIGN_POST: {
                 // Post
                 SDL_SetRenderDrawColor(renderer, 101, 67, 33, 255);
                 SDL_Rect post = {rect.x + rect.w/2 - 3, rect.y + 10, 6, rect.h - 10};
@@ -171,6 +173,7 @@ void Level::render(SDL_Renderer* renderer) {
                 SDL_SetRenderDrawColor(renderer, 101, 67, 33, 255);
                 SDL_RenderDrawRect(renderer, &sign);
                 break;
+            }
         }
     }
 
