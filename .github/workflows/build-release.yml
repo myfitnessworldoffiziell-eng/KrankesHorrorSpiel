@@ -37,6 +37,13 @@ jobs:
           cp -r assets ECHOES-Windows/ || true
           cp README.md ECHOES-Windows/ || true
           cp INSTALL_GUIDE.md ECHOES-Windows/ || true
+          # Copy SDL2 DLLs from vcpkg
+          cp vcpkg/installed/x64-windows/bin/SDL2.dll ECHOES-Windows/
+          cp vcpkg/installed/x64-windows/bin/SDL2_image.dll ECHOES-Windows/
+          cp vcpkg/installed/x64-windows/bin/SDL2_mixer.dll ECHOES-Windows/
+          cp vcpkg/installed/x64-windows/bin/SDL2_ttf.dll ECHOES-Windows/
+          # Copy additional dependencies
+          cp vcpkg/installed/x64-windows/bin/*.dll ECHOES-Windows/ 2>/dev/null || true
 
       - name: Create ZIP
         run: |
