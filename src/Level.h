@@ -73,14 +73,37 @@ public:
     // Platform access (needed for collision detection)
     struct Platform {
         float x, y, width, height;
+        int materialType;  // 0=grass, 1=stone, 2=metal, 3=wood
     };
     const std::vector<Platform>& getPlatforms() const { return m_platforms; }
+
+    // Background decorations (visual only, no collision)
+    enum class DecorationType {
+        TREE,
+        ROCK,
+        BUSH,
+        CLOUD,
+        GRASS_TUFT,
+        FLOWER,
+        STONE_PILE,
+        FENCE,
+        SIGN_POST
+    };
+
+    struct BackgroundDecoration {
+        float x, y;
+        float width, height;
+        DecorationType type;
+        int colorVariant;  // 0-2 for color variations
+    };
+    const std::vector<BackgroundDecoration>& getDecorations() const { return m_decorations; }
 
 private:
 
     int m_levelNumber;
     bool m_levelComplete;
     std::vector<Platform> m_platforms;
+    std::vector<BackgroundDecoration> m_decorations;
     std::vector<std::unique_ptr<Enemy>> m_enemies;
     std::vector<std::unique_ptr<NPC>> m_npcs;
     std::unique_ptr<Boss> m_boss;
