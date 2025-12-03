@@ -685,19 +685,84 @@ void Level::createLevel3(AudioManager* audioManager) {
 }
 
 // ========================================
-// LEVEL 4: Echoes of the Past
+// LEVEL 4: Echoes of the Past (Extended & Dark)
 // ========================================
 void Level::createLevel4(AudioManager* audioManager) {
-    m_backgroundColor[0] = 100.0f;
+    m_backgroundColor[0] = 100.0f;  // Darker blue-gray
     m_backgroundColor[1] = 150.0f;
     m_backgroundColor[2] = 200.0f;
 
-    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
-    m_platforms.push_back({100.0f, 450.0f, 100.0f, 20.0f});
-    m_platforms.push_back({300.0f, 380.0f, 100.0f, 20.0f});
-    m_platforms.push_back({500.0f, 450.0f, 100.0f, 20.0f});
-    m_platforms.push_back({650.0f, 350.0f, 120.0f, 20.0f});
+    // Platforms - Heavily corrupted, mostly metal and stone
+    m_platforms.push_back({0.0f, 550.0f, 180.0f, 50.0f, 1});       // Ground - stone
+    m_platforms.push_back({180.0f, 550.0f, 200.0f, 50.0f, 2});     // Ground - metal (corrupted)
+    m_platforms.push_back({380.0f, 550.0f, 220.0f, 50.0f, 1});     // Ground - stone
+    m_platforms.push_back({600.0f, 550.0f, 200.0f, 50.0f, 2});     // Ground - metal
 
+    // Lower platforms - irregular corrupted pattern
+    m_platforms.push_back({100.0f, 470.0f, 95.0f, 18.0f, 2});      // Metal
+    m_platforms.push_back({250.0f, 420.0f, 100.0f, 18.0f, 1});     // Stone
+    m_platforms.push_back({410.0f, 480.0f, 95.0f, 18.0f, 2});      // Metal
+    m_platforms.push_back({560.0f, 440.0f, 100.0f, 18.0f, 1});     // Stone
+    m_platforms.push_back({710.0f, 490.0f, 80.0f, 18.0f, 2});      // Metal
+
+    // Middle platforms - floating ruins
+    m_platforms.push_back({80.0f, 370.0f, 90.0f, 18.0f, 1});       // Stone ruins
+    m_platforms.push_back({220.0f, 340.0f, 85.0f, 18.0f, 2});      // Metal debris
+    m_platforms.push_back({360.0f, 390.0f, 95.0f, 18.0f, 1});      // Stone ruins
+    m_platforms.push_back({510.0f, 350.0f, 90.0f, 18.0f, 2});      // Metal debris
+    m_platforms.push_back({650.0f, 400.0f, 85.0f, 18.0f, 1});      // Stone ruins
+
+    // Upper platforms - very corrupted
+    m_platforms.push_back({140.0f, 260.0f, 75.0f, 15.0f, 2});      // Metal
+    m_platforms.push_back({280.0f, 230.0f, 80.0f, 15.0f, 2});      // Metal
+    m_platforms.push_back({430.0f, 270.0f, 85.0f, 15.0f, 1});      // Stone
+    m_platforms.push_back({580.0f, 240.0f, 80.0f, 15.0f, 2});      // Metal
+    m_platforms.push_back({710.0f, 300.0f, 75.0f, 15.0f, 2});      // Metal
+
+    // Background Decorations - Haunted, ghostly atmosphere
+    // Very dark, ominous clouds
+    m_decorations.push_back({20.0f, 20.0f, 120.0f, 45.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({170.0f, 40.0f, 130.0f, 48.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({380.0f, 25.0f, 115.0f, 42.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({580.0f, 45.0f, 125.0f, 46.0f, DecorationType::CLOUD, 2});
+
+    // Dead trees (barren, skeletal)
+    m_decorations.push_back({10.0f, 490.0f, 38.0f, 60.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({140.0f, 490.0f, 40.0f, 60.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({300.0f, 490.0f, 36.0f, 58.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({460.0f, 490.0f, 38.0f, 60.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({620.0f, 490.0f, 40.0f, 58.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({760.0f, 490.0f, 36.0f, 60.0f, DecorationType::TREE, 2});
+
+    // Ruined structures (stone piles)
+    m_decorations.push_back({60.0f, 525.0f, 40.0f, 25.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({200.0f, 525.0f, 45.0f, 25.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({360.0f, 525.0f, 42.0f, 25.0f, DecorationType::STONE_PILE, 2});
+    m_decorations.push_back({520.0f, 525.0f, 40.0f, 25.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({680.0f, 525.0f, 43.0f, 25.0f, DecorationType::STONE_PILE, 1});
+
+    // Large rocks (debris)
+    m_decorations.push_back({100.0f, 532.0f, 35.0f, 20.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({260.0f, 532.0f, 38.0f, 22.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({420.0f, 532.0f, 36.0f, 20.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({580.0f, 532.0f, 40.0f, 22.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({720.0f, 532.0f, 35.0f, 20.0f, DecorationType::ROCK, 1});
+
+    // Broken fences and sign posts (abandoned)
+    m_decorations.push_back({120.0f, 520.0f, 80.0f, 30.0f, DecorationType::FENCE, 0});
+    m_decorations.push_back({440.0f, 520.0f, 75.0f, 30.0f, DecorationType::FENCE, 0});
+    m_decorations.push_back({80.0f, 510.0f, 30.0f, 40.0f, DecorationType::SIGN_POST, 0});
+    m_decorations.push_back({380.0f, 510.0f, 30.0f, 40.0f, DecorationType::SIGN_POST, 0});
+    m_decorations.push_back({660.0f, 510.0f, 30.0f, 40.0f, DecorationType::SIGN_POST, 0});
+
+    // Dead bushes (very dark)
+    m_decorations.push_back({40.0f, 528.0f, 25.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({170.0f, 528.0f, 28.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({330.0f, 528.0f, 26.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({490.0f, 528.0f, 27.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({650.0f, 528.0f, 28.0f, 22.0f, DecorationType::BUSH, 2});
+
+    // Enemies - Glitch enemies only
     m_enemies.push_back(std::make_unique<GlitchSlime>(250.0f, 518.0f, audioManager));
     m_enemies.push_back(std::make_unique<GlitchSlime>(550.0f, 518.0f, audioManager));
 
@@ -708,32 +773,103 @@ void Level::createLevel4(AudioManager* audioManager) {
     corruptedNPC->addDialogue("B̷e̷f̵o̸r̴e̷ ̶i̵t̴'̵s̶ ̴t̶o̵o̸ ̵l̶a̸t̷e̸");
     m_npcs.push_back(std::move(corruptedNPC));
 
-    m_stars.push_back({150.0f, 420.0f, false});
-    m_stars.push_back({350.0f, 350.0f, false});
-    m_stars.push_back({550.0f, 420.0f, false});
-    m_stars.push_back({720.0f, 320.0f, false});
+    // Stars - spread across haunted level
+    m_stars.push_back({150.0f, 440.0f, false});      // Lower left
+    m_stars.push_back({300.0f, 390.0f, false});      // Middle left
+    m_stars.push_back({460.0f, 450.0f, false});      // Center
+    m_stars.push_back({610.0f, 410.0f, false});      // Middle right
+    m_stars.push_back({750.0f, 460.0f, false});      // Lower right
+    m_stars.push_back({190.0f, 300.0f, false});      // High left
+    m_stars.push_back({350.0f, 200.0f, false});      // Very high
 
     // Code Fragment 1: "F I R"
     m_codeFragments.push_back({400.0f, 250.0f, "F I R", false});
 
-    m_goal = {750.0f, 480.0f, 40.0f, 60.0f, false};
+    // Goal portal
+    m_goal = {745.0f, 460.0f, 40.0f, 60.0f, false};
 }
 
 // ========================================
-// LEVEL 5: Corrupted City
+// LEVEL 5: Corrupted City (Extended & Urban Decay)
 // ========================================
 void Level::createLevel5(AudioManager* audioManager) {
-    m_backgroundColor[0] = 80.0f;
+    m_backgroundColor[0] = 80.0f;   // Very dark, polluted sky
     m_backgroundColor[1] = 80.0f;
     m_backgroundColor[2] = 120.0f;
 
-    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
-    m_platforms.push_back({80.0f, 450.0f, 80.0f, 20.0f});
-    m_platforms.push_back({200.0f, 380.0f, 80.0f, 20.0f});
-    m_platforms.push_back({350.0f, 450.0f, 80.0f, 20.0f});
-    m_platforms.push_back({500.0f, 350.0f, 80.0f, 20.0f});
-    m_platforms.push_back({650.0f, 450.0f, 120.0f, 20.0f});
+    // Platforms - Urban ruins, mostly metal and stone (city buildings)
+    m_platforms.push_back({0.0f, 550.0f, 200.0f, 50.0f, 2});       // Ground - metal (streets)
+    m_platforms.push_back({200.0f, 550.0f, 180.0f, 50.0f, 1});     // Ground - stone (rubble)
+    m_platforms.push_back({380.0f, 550.0f, 220.0f, 50.0f, 2});     // Ground - metal
+    m_platforms.push_back({600.0f, 550.0f, 200.0f, 50.0f, 1});     // Ground - stone
 
+    // Lower platforms - broken buildings
+    m_platforms.push_back({80.0f, 475.0f, 90.0f, 18.0f, 2});       // Metal structure
+    m_platforms.push_back({220.0f, 425.0f, 95.0f, 18.0f, 1});      // Stone debris
+    m_platforms.push_back({370.0f, 485.0f, 100.0f, 18.0f, 2});     // Metal structure
+    m_platforms.push_back({520.0f, 445.0f, 95.0f, 18.0f, 1});      // Stone debris
+    m_platforms.push_back({670.0f, 495.0f, 90.0f, 18.0f, 2});      // Metal structure
+
+    // Middle platforms - urban ruins
+    m_platforms.push_back({70.0f, 375.0f, 85.0f, 18.0f, 2});       // Metal building
+    m_platforms.push_back({200.0f, 345.0f, 90.0f, 18.0f, 1});      // Stone rubble
+    m_platforms.push_back({340.0f, 395.0f, 95.0f, 18.0f, 2});      // Metal building
+    m_platforms.push_back({490.0f, 355.0f, 90.0f, 18.0f, 1});      // Stone rubble
+    m_platforms.push_back({630.0f, 405.0f, 85.0f, 18.0f, 2});      // Metal building
+
+    // Upper platforms - high rises
+    m_platforms.push_back({130.0f, 265.0f, 80.0f, 15.0f, 2});      // Metal skyscraper
+    m_platforms.push_back({270.0f, 235.0f, 85.0f, 15.0f, 2});      // Metal skyscraper
+    m_platforms.push_back({420.0f, 275.0f, 90.0f, 15.0f, 1});      // Stone tower
+    m_platforms.push_back({570.0f, 245.0f, 85.0f, 15.0f, 2});      // Metal skyscraper
+    m_platforms.push_back({700.0f, 305.0f, 80.0f, 15.0f, 2});      // Metal skyscraper
+
+    // Background Decorations - Dystopian city
+    // Smog clouds (very dark)
+    m_decorations.push_back({10.0f, 15.0f, 130.0f, 50.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({160.0f, 35.0f, 140.0f, 52.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({360.0f, 20.0f, 125.0f, 48.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({560.0f, 40.0f, 135.0f, 50.0f, DecorationType::CLOUD, 2});
+
+    // Dead trees (urban pollution)
+    m_decorations.push_back({20.0f, 495.0f, 35.0f, 55.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({160.0f, 495.0f, 38.0f, 55.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({320.0f, 495.0f, 36.0f, 55.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({480.0f, 495.0f, 37.0f, 55.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({640.0f, 495.0f, 35.0f, 55.0f, DecorationType::TREE, 2});
+
+    // Building ruins (large stone piles)
+    m_decorations.push_back({50.0f, 520.0f, 50.0f, 30.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({180.0f, 520.0f, 55.0f, 30.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({340.0f, 520.0f, 52.0f, 30.0f, DecorationType::STONE_PILE, 2});
+    m_decorations.push_back({500.0f, 520.0f, 50.0f, 30.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({660.0f, 520.0f, 53.0f, 30.0f, DecorationType::STONE_PILE, 1});
+
+    // Debris rocks
+    m_decorations.push_back({90.0f, 530.0f, 38.0f, 22.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({240.0f, 530.0f, 40.0f, 24.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({400.0f, 530.0f, 38.0f, 22.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({560.0f, 530.0f, 42.0f, 24.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({710.0f, 530.0f, 38.0f, 22.0f, DecorationType::ROCK, 1});
+
+    // Broken fences and barriers
+    m_decorations.push_back({110.0f, 518.0f, 90.0f, 32.0f, DecorationType::FENCE, 0});
+    m_decorations.push_back({420.0f, 518.0f, 85.0f, 32.0f, DecorationType::FENCE, 0});
+
+    // Warning signs everywhere
+    m_decorations.push_back({70.0f, 505.0f, 32.0f, 45.0f, DecorationType::SIGN_POST, 0});
+    m_decorations.push_back({280.0f, 505.0f, 32.0f, 45.0f, DecorationType::SIGN_POST, 0});
+    m_decorations.push_back({520.0f, 505.0f, 32.0f, 45.0f, DecorationType::SIGN_POST, 0});
+    m_decorations.push_back({720.0f, 505.0f, 32.0f, 45.0f, DecorationType::SIGN_POST, 0});
+
+    // Dead bushes (urban wasteland)
+    m_decorations.push_back({30.0f, 528.0f, 24.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({150.0f, 528.0f, 26.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({310.0f, 528.0f, 25.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({470.0f, 528.0f, 24.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({630.0f, 528.0f, 26.0f, 22.0f, DecorationType::BUSH, 2});
+
+    // Enemies - All glitchy + spike ball
     m_enemies.push_back(std::make_unique<GlitchSlime>(200.0f, 518.0f, audioManager));
     m_enemies.push_back(std::make_unique<GlitchSlime>(400.0f, 518.0f, audioManager));
     m_enemies.push_back(std::make_unique<GlitchSlime>(600.0f, 518.0f, audioManager));
@@ -745,25 +881,46 @@ void Level::createLevel5(AudioManager* audioManager) {
     warningNPC->addDialogue("I̴t̴ ̷k̷n̸o̵w̶s̶ ̶y̶o̴u̷'̸r̴e̵ ̴h̴e̷r̸e̶");
     m_npcs.push_back(std::move(warningNPC));
 
-    m_stars.push_back({130.0f, 420.0f, false});
-    m_stars.push_back({250.0f, 350.0f, false});
-    m_stars.push_back({400.0f, 420.0f, false});
-    m_stars.push_back({550.0f, 320.0f, false});
-    m_stars.push_back({720.0f, 420.0f, false});
+    // Stars - spread across corrupted city
+    m_stars.push_back({130.0f, 445.0f, false});      // Lower left
+    m_stars.push_back({270.0f, 395.0f, false});      // Middle left
+    m_stars.push_back({420.0f, 455.0f, false});      // Center
+    m_stars.push_back({570.0f, 415.0f, false});      // Middle right
+    m_stars.push_back({720.0f, 465.0f, false});      // Lower right
+    m_stars.push_back({180.0f, 305.0f, false});      // High left
+    m_stars.push_back({340.0f, 205.0f, false});      // Very high
+    m_stars.push_back({620.0f, 215.0f, false});      // High right
 
-    m_goal = {750.0f, 480.0f, 40.0f, 60.0f, false};
+    // Goal portal
+    m_goal = {745.0f, 465.0f, 40.0f, 60.0f, false};
 }
 
 // ========================================
-// LEVEL 6: The Glitch Arena (BOSS LEVEL - STUB)
+// LEVEL 6: The Glitch Arena (BOSS LEVEL - Extended Arena)
 // ========================================
 void Level::createLevel6(AudioManager* audioManager) {
-    m_backgroundColor[0] = 60.0f;
+    m_backgroundColor[0] = 60.0f;   // Dark purple void
     m_backgroundColor[1] = 60.0f;
     m_backgroundColor[2] = 100.0f;
 
-    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
-    m_platforms.push_back({200.0f, 450.0f, 400.0f, 20.0f});
+    // Platforms - Arena style with floating platforms
+    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f, 2});           // Main ground - metal
+    m_platforms.push_back({200.0f, 450.0f, 400.0f, 20.0f, 2});         // Central platform - metal
+    m_platforms.push_back({50.0f, 480.0f, 120.0f, 15.0f, 2});          // Side left - metal
+    m_platforms.push_back({630.0f, 480.0f, 120.0f, 15.0f, 2});         // Side right - metal
+    m_platforms.push_back({150.0f, 350.0f, 100.0f, 15.0f, 2});         // Upper left - metal
+    m_platforms.push_back({550.0f, 350.0f, 100.0f, 15.0f, 2});         // Upper right - metal
+    m_platforms.push_back({350.0f, 280.0f, 100.0f, 15.0f, 2});         // Highest - metal
+
+    // Background Decorations - Void atmosphere (minimal, ominous)
+    m_decorations.push_back({100.0f, 10.0f, 150.0f, 55.0f, DecorationType::CLOUD, 2});  // Void clouds
+    m_decorations.push_back({400.0f, 30.0f, 160.0f, 58.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({650.0f, 15.0f, 145.0f, 53.0f, DecorationType::CLOUD, 2});
+
+    // Stone ruins (arena debris)
+    m_decorations.push_back({20.0f, 520.0f, 60.0f, 30.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({720.0f, 520.0f, 60.0f, 30.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({380.0f, 525.0f, 40.0f, 25.0f, DecorationType::STONE_PILE, 2});
 
     // THE GLITCH BOSS (First encounter)
     m_boss = std::make_unique<GlitchBoss>(400.0f, 300.0f, audioManager);
@@ -777,17 +934,42 @@ void Level::createLevel6(AudioManager* audioManager) {
 }
 
 // ========================================
-// LEVEL 7: Developer Room
+// LEVEL 7: Developer Room (Extended & Creepy Office)
 // ========================================
 void Level::createLevel7(AudioManager* audioManager) {
-    m_backgroundColor[0] = 40.0f;
+    m_backgroundColor[0] = 40.0f;   // Almost black office
     m_backgroundColor[1] = 40.0f;
     m_backgroundColor[2] = 45.0f;
 
-    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
-    m_platforms.push_back({100.0f, 450.0f, 150.0f, 20.0f});
-    m_platforms.push_back({300.0f, 350.0f, 150.0f, 20.0f});
-    m_platforms.push_back({500.0f, 450.0f, 150.0f, 20.0f});
+    // Platforms - Office/workspace style
+    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f, 3});           // Floor - wood
+    m_platforms.push_back({100.0f, 470.0f, 150.0f, 18.0f, 3});         // Desk left - wood
+    m_platforms.push_back({300.0f, 400.0f, 150.0f, 18.0f, 3});         // Desk center - wood
+    m_platforms.push_back({500.0f, 470.0f, 150.0f, 18.0f, 3});         // Desk right - wood
+    m_platforms.push_back({680.0f, 420.0f, 100.0f, 18.0f, 2});         // Metal shelf
+    m_platforms.push_back({50.0f, 360.0f, 120.0f, 15.0f, 3});          // Upper desk left
+    m_platforms.push_back({220.0f, 310.0f, 130.0f, 15.0f, 3});         // Upper desk center
+    m_platforms.push_back({400.0f, 360.0f, 120.0f, 15.0f, 3});         // Upper desk right
+    m_platforms.push_back({570.0f, 330.0f, 110.0f, 15.0f, 2});         // Metal platform
+
+    // Background Decorations - Office horror
+    // Very dark ambient (no visible clouds)
+
+    // Desks/furniture (stone piles = broken furniture)
+    m_decorations.push_back({30.0f, 522.0f, 55.0f, 28.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({200.0f, 522.0f, 60.0f, 28.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({420.0f, 522.0f, 58.0f, 28.0f, DecorationType::STONE_PILE, 2});
+    m_decorations.push_back({650.0f, 522.0f, 55.0f, 28.0f, DecorationType::STONE_PILE, 0});
+
+    // Cables/wires (rocks = debris)
+    m_decorations.push_back({80.0f, 535.0f, 30.0f, 15.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({260.0f, 535.0f, 32.0f, 15.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({480.0f, 535.0f, 30.0f, 15.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({720.0f, 535.0f, 28.0f, 15.0f, DecorationType::ROCK, 2});
+
+    // Office dividers (fences)
+    m_decorations.push_back({150.0f, 515.0f, 100.0f, 35.0f, DecorationType::FENCE, 0});
+    m_decorations.push_back({550.0f, 515.0f, 100.0f, 35.0f, DecorationType::FENCE, 0});
 
     // Terminal 1
     auto terminal1 = std::make_unique<NPC>(80.0f, 500.0f, NPCType::TERMINAL, audioManager);
@@ -843,7 +1025,7 @@ void Level::createLevel7(AudioManager* audioManager) {
 }
 
 // ========================================
-// LEVEL 8: Memory Fragments
+// LEVEL 8: Memory Fragments (Extended & Chaotic)
 // ========================================
 void Level::createLevel8(AudioManager* audioManager) {
     // Chaotic mix - all level colors mixed
@@ -851,11 +1033,62 @@ void Level::createLevel8(AudioManager* audioManager) {
     m_backgroundColor[1] = 100.0f;
     m_backgroundColor[2] = 150.0f;
 
-    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
-    m_platforms.push_back({100.0f, 450.0f, 100.0f, 20.0f});
-    m_platforms.push_back({250.0f, 350.0f, 100.0f, 20.0f});
-    m_platforms.push_back({400.0f, 450.0f, 100.0f, 20.0f});
-    m_platforms.push_back({550.0f, 320.0f, 100.0f, 20.0f});
+    // Platforms - Chaotic mix of all materials (glitched reality)
+    m_platforms.push_back({0.0f, 550.0f, 200.0f, 50.0f, 0});           // Grass
+    m_platforms.push_back({200.0f, 550.0f, 180.0f, 50.0f, 3});         // Wood
+    m_platforms.push_back({380.0f, 550.0f, 220.0f, 50.0f, 1});         // Stone
+    m_platforms.push_back({600.0f, 550.0f, 200.0f, 50.0f, 2});         // Metal
+
+    // Chaotic floating platforms
+    m_platforms.push_back({100.0f, 475.0f, 95.0f, 18.0f, 0});          // Grass
+    m_platforms.push_back({240.0f, 430.0f, 100.0f, 18.0f, 3});         // Wood
+    m_platforms.push_back({400.0f, 485.0f, 95.0f, 18.0f, 1});          // Stone
+    m_platforms.push_back({560.0f, 450.0f, 100.0f, 18.0f, 2});         // Metal
+    m_platforms.push_back({710.0f, 495.0f, 80.0f, 18.0f, 0});          // Grass
+
+    m_platforms.push_back({80.0f, 375.0f, 85.0f, 18.0f, 2});           // Metal
+    m_platforms.push_back({210.0f, 340.0f, 90.0f, 18.0f, 1});          // Stone
+    m_platforms.push_back({350.0f, 395.0f, 95.0f, 18.0f, 3});          // Wood
+    m_platforms.push_back({500.0f, 355.0f, 90.0f, 18.0f, 0});          // Grass
+    m_platforms.push_back({640.0f, 405.0f, 85.0f, 18.0f, 2});          // Metal
+
+    m_platforms.push_back({140.0f, 265.0f, 80.0f, 15.0f, 3});          // Wood
+    m_platforms.push_back({280.0f, 235.0f, 85.0f, 15.0f, 1});          // Stone
+    m_platforms.push_back({430.0f, 275.0f, 90.0f, 15.0f, 2});          // Metal
+    m_platforms.push_back({580.0f, 245.0f, 85.0f, 15.0f, 0});          // Grass
+
+    // Background Decorations - Mixed reality glitch
+    // Mixed dark clouds
+    m_decorations.push_back({30.0f, 20.0f, 120.0f, 45.0f, DecorationType::CLOUD, 1});
+    m_decorations.push_back({200.0f, 40.0f, 130.0f, 48.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({400.0f, 25.0f, 115.0f, 42.0f, DecorationType::CLOUD, 1});
+    m_decorations.push_back({600.0f, 45.0f, 125.0f, 46.0f, DecorationType::CLOUD, 2});
+
+    // Mixed trees
+    m_decorations.push_back({15.0f, 492.0f, 38.0f, 58.0f, DecorationType::TREE, 0});
+    m_decorations.push_back({150.0f, 492.0f, 40.0f, 58.0f, DecorationType::TREE, 1});
+    m_decorations.push_back({310.0f, 492.0f, 36.0f, 58.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({470.0f, 492.0f, 38.0f, 58.0f, DecorationType::TREE, 0});
+    m_decorations.push_back({630.0f, 492.0f, 40.0f, 58.0f, DecorationType::TREE, 1});
+
+    // Chaos debris (mixed stone piles and rocks)
+    m_decorations.push_back({60.0f, 525.0f, 42.0f, 25.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({200.0f, 525.0f, 45.0f, 25.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({360.0f, 525.0f, 40.0f, 25.0f, DecorationType::STONE_PILE, 2});
+    m_decorations.push_back({520.0f, 525.0f, 42.0f, 25.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({680.0f, 525.0f, 43.0f, 25.0f, DecorationType::STONE_PILE, 1});
+
+    m_decorations.push_back({100.0f, 532.0f, 32.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({260.0f, 532.0f, 35.0f, 20.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({420.0f, 532.0f, 33.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({580.0f, 532.0f, 36.0f, 20.0f, DecorationType::ROCK, 2});
+
+    // Mixed bushes
+    m_decorations.push_back({40.0f, 528.0f, 26.0f, 22.0f, DecorationType::BUSH, 0});
+    m_decorations.push_back({180.0f, 528.0f, 28.0f, 22.0f, DecorationType::BUSH, 1});
+    m_decorations.push_back({340.0f, 528.0f, 27.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({500.0f, 528.0f, 26.0f, 22.0f, DecorationType::BUSH, 0});
+    m_decorations.push_back({660.0f, 528.0f, 28.0f, 22.0f, DecorationType::BUSH, 1});
 
     // THE GLITCH BOSS (Second encounter - Harder!)
     m_boss = std::make_unique<GlitchBoss>(400.0f, 250.0f, audioManager);
@@ -882,7 +1115,7 @@ void Level::createLevel8(AudioManager* audioManager) {
 }
 
 // ========================================
-// LEVEL 9: The Loop
+// LEVEL 9: The Loop (Extended & Liminal)
 // ========================================
 void Level::createLevel9(AudioManager* audioManager) {
     // Gray, lifeless
@@ -890,9 +1123,32 @@ void Level::createLevel9(AudioManager* audioManager) {
     m_backgroundColor[1] = 120.0f;
     m_backgroundColor[2] = 120.0f;
 
-    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f});
-    m_platforms.push_back({200.0f, 450.0f, 150.0f, 20.0f});
-    m_platforms.push_back({450.0f, 380.0f, 150.0f, 20.0f});
+    // Platforms - Minimal, repeating pattern (loop feeling)
+    m_platforms.push_back({0.0f, 550.0f, 800.0f, 50.0f, 1});           // Ground - stone
+    m_platforms.push_back({150.0f, 470.0f, 120.0f, 18.0f, 1});         // Stone platform
+    m_platforms.push_back({350.0f, 410.0f, 120.0f, 18.0f, 1});         // Stone platform
+    m_platforms.push_back({550.0f, 470.0f, 120.0f, 18.0f, 1});         // Stone platform (repeating)
+    m_platforms.push_back({100.0f, 360.0f, 110.0f, 15.0f, 1});         // Stone upper
+    m_platforms.push_back({300.0f, 300.0f, 110.0f, 15.0f, 1});         // Stone upper
+    m_platforms.push_back({500.0f, 360.0f, 110.0f, 15.0f, 1});         // Stone upper (repeating)
+    m_platforms.push_back({680.0f, 420.0f, 100.0f, 15.0f, 1});         // Stone
+
+    // Background Decorations - Minimal, liminal space
+    // Gray clouds (fog)
+    m_decorations.push_back({50.0f, 25.0f, 130.0f, 48.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({250.0f, 45.0f, 135.0f, 50.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({450.0f, 30.0f, 130.0f, 48.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({650.0f, 50.0f, 135.0f, 50.0f, DecorationType::CLOUD, 2});
+
+    // Minimal stone piles (empty void)
+    m_decorations.push_back({100.0f, 525.0f, 45.0f, 25.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({350.0f, 525.0f, 45.0f, 25.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({600.0f, 525.0f, 45.0f, 25.0f, DecorationType::STONE_PILE, 1});
+
+    // Few rocks (debris in void)
+    m_decorations.push_back({180.0f, 532.0f, 32.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({430.0f, 532.0f, 32.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({680.0f, 532.0f, 32.0f, 18.0f, DecorationType::ROCK, 1});
 
     // Minimal enemies
     m_enemies.push_back(std::make_unique<GreenSlime>(300.0f, 518.0f, audioManager));
@@ -911,7 +1167,7 @@ void Level::createLevel9(AudioManager* audioManager) {
 }
 
 // ========================================
-// LEVEL 10: ECHO.exe (FINAL BOSS - STUB)
+// LEVEL 10: ECHO.exe (FINAL BOSS - The Void)
 // ========================================
 void Level::createLevel10(AudioManager* audioManager) {
     // Pure black void
@@ -919,7 +1175,27 @@ void Level::createLevel10(AudioManager* audioManager) {
     m_backgroundColor[1] = 0.0f;
     m_backgroundColor[2] = 0.0f;
 
-    m_platforms.push_back({200.0f, 550.0f, 400.0f, 50.0f});
+    // Platforms - Minimal arena in the void
+    m_platforms.push_back({200.0f, 550.0f, 400.0f, 50.0f, 2});         // Central ground - metal
+    m_platforms.push_back({100.0f, 480.0f, 150.0f, 18.0f, 2});         // Left side - metal
+    m_platforms.push_back({550.0f, 480.0f, 150.0f, 18.0f, 2});         // Right side - metal
+    m_platforms.push_back({300.0f, 400.0f, 200.0f, 18.0f, 2});         // Upper center - metal
+    m_platforms.push_back({150.0f, 330.0f, 120.0f, 15.0f, 2});         // Upper left - metal
+    m_platforms.push_back({530.0f, 330.0f, 120.0f, 15.0f, 2});         // Upper right - metal
+    m_platforms.push_back({350.0f, 260.0f, 100.0f, 15.0f, 2});         // Highest - metal
+
+    // Background Decorations - Void (minimal presence)
+    // No clouds in pure void
+
+    // Stone ruins (broken reality)
+    m_decorations.push_back({80.0f, 520.0f, 60.0f, 30.0f, DecorationType::STONE_PILE, 0});
+    m_decorations.push_back({660.0f, 520.0f, 60.0f, 30.0f, DecorationType::STONE_PILE, 1});
+    m_decorations.push_back({380.0f, 525.0f, 40.0f, 25.0f, DecorationType::STONE_PILE, 2});
+
+    // Rocks (void debris)
+    m_decorations.push_back({150.0f, 532.0f, 35.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({400.0f, 532.0f, 38.0f, 20.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({620.0f, 532.0f, 35.0f, 18.0f, DecorationType::ROCK, 1});
 
     // ECHO PRIME - FINAL BOSS
     m_boss = std::make_unique<EchoPrime>(400.0f, 300.0f, audioManager);
