@@ -73,6 +73,7 @@ private:
     int m_selectedOption;
     float m_selectionTimer;
     bool m_showingControls;
+    bool m_shouldGoBack;
 
     // Available resolutions
     struct Resolution {

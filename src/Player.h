@@ -33,6 +33,10 @@ public:
     float getVelocityY() const { return m_velocityY; }
     void setVelocityY(float vy) { m_velocityY = vy; }
 
+    // Position setters (for platform collision)
+    void setY(float y) { m_y = y; }
+    void setOnGround(bool onGround) { m_onGround = onGround; }
+
     // Collision
     SDL_Rect getBounds() const;
 

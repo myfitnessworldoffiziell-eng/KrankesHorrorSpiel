@@ -62,16 +62,19 @@ void Player::update(float deltaTime) {
     m_x += m_velocityX * deltaTime;
     m_y += m_velocityY * deltaTime;
 
-    // Simple Ground Collision (y = 500)
-    if (m_y >= 500.0f) {
-        m_y = 500.0f;
-        m_velocityY = 0.0f;
-        m_onGround = true;
-    }
+    // Reset ground state (will be set by platform collision in Game.cpp)
+    m_onGround = false;
 
     // Screen Bounds
     if (m_x < 0.0f) m_x = 0.0f;
     if (m_x > 800.0f - m_width) m_x = 800.0f - m_width;
+
+    // Fallback: prevent falling off screen
+    if (m_y > 600.0f) {
+        m_y = 500.0f;
+        m_velocityY = 0.0f;
+        m_onGround = true;
+    }
 
     // Animation
     m_animationTimer += deltaTime;

@@ -70,10 +70,13 @@ public:
     const Goal& getGoal() const { return m_goal; }
     void activateGoal() { m_goal.active = true; }
 
-private:
+    // Platform access (needed for collision detection)
     struct Platform {
         float x, y, width, height;
     };
+    const std::vector<Platform>& getPlatforms() const { return m_platforms; }
+
+private:
 
     int m_levelNumber;
     bool m_levelComplete;

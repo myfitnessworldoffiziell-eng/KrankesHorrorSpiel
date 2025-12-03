@@ -142,7 +142,7 @@ bool Game::initialize() {
     std::cout << "Loading audio files..." << std::endl;
 
     // Music (4 tracks)
-    m_audioManager->loadMusic("menu", "assets/audio/menu_music.mp3");
+    m_audioManager->loadMusic("menu", "assets/audio/horror_ambient.mp3");  // 👻 Creepy menu music!
     m_audioManager->loadMusic("level", "assets/audio/level_music.mp3");
     m_audioManager->loadMusic("corrupted", "assets/audio/corrupted_music.mp3");
     m_audioManager->loadMusic("horror_ambient", "assets/audio/horror_ambient.mp3");
@@ -481,6 +481,33 @@ void Game::updatePlaying(float deltaTime) {
     m_level->update(deltaTime, m_player.get());
 
     // === COLLISION DETECTION ===
+
+    // Player vs Platforms
+    if (m_player->isAlive() && m_player->getVelocityY() > 0) {  // Only check when falling
+        SDL_Rect playerBounds = m_player->getBounds();
+
+        for (const auto& platform : m_level->getPlatforms()) {
+            // Check if player is above platform and overlaps horizontally
+            float playerBottom = m_player->getY() + 32.0f;  // Player height = 32
+            float platformTop = platform.y;
+
+            // Check horizontal overlap
+            bool horizontalOverlap = (m_player->getX() + 32.0f > platform.x) &&
+                                    (m_player->getX() < platform.x + platform.width);
+
+            // Check if player just landed on platform (within 10 pixels)
+            bool justAbove = (playerBottom >= platformTop) &&
+                           (playerBottom < platformTop + 10.0f);
+
+            if (horizontalOverlap && justAbove) {
+                // Place player exactly on platform
+                m_player->setY(platformTop - 32.0f);
+                m_player->setVelocityY(0.0f);
+                m_player->setOnGround(true);
+                break;  // Stop checking other platforms
+            }
+        }
+    }
 
     // Player vs Enemies
     if (m_player->isAlive()) {

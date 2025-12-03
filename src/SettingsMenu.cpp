@@ -12,6 +12,7 @@ SettingsMenu::SettingsMenu(AudioManager* audioManager)
     , m_selectedOption(0)
     , m_selectionTimer(0.0f)
     , m_showingControls(false)
+    , m_shouldGoBack(false)
 {
     // Initialize available resolutions
     m_resolutions = {
@@ -61,6 +62,13 @@ void SettingsMenu::setResolutionIndex(int index) {
 
 SettingsMenu::SettingsResult SettingsMenu::update(float deltaTime) {
     m_selectionTimer += deltaTime;
+
+    // Check if user wants to go back
+    if (m_shouldGoBack) {
+        m_shouldGoBack = false;  // Reset flag
+        return SettingsResult::BACK_TO_MENU;
+    }
+
     return SettingsResult::NONE;
 }
 
@@ -171,6 +179,7 @@ void SettingsMenu::selectCurrentOption() {
 
         case SettingsOption::BACK:
             std::cout << "[Settings] Back to menu" << std::endl;
+            m_shouldGoBack = true;  // Signal to return to main menu
             break;
 
         default:
