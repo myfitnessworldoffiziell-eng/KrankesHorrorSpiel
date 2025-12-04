@@ -118,6 +118,7 @@ bool Game::initialize() {
     m_permissionManager = std::make_unique<PermissionManager>();
     m_corruptionSystem = std::make_unique<CorruptionSystem>(m_renderer);
     m_audioManager = std::make_unique<AudioManager>();
+    m_corruptionSystem->setAudioManager(m_audioManager.get());  // Connect audio to corruption system
     m_player = std::make_unique<Player>();
     m_player->setAudioManager(m_audioManager.get());  // Connect audio to player
     m_level = std::make_unique<Level>();

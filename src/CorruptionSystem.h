@@ -4,6 +4,8 @@
 #include <vector>
 #include <random>
 
+class AudioManager;
+
 /**
  * CorruptionSystem
  * Visuelle Glitch-Effekte und Bildschirm-Manipulationen
@@ -19,6 +21,9 @@ public:
     // Manueller Glitch-Trigger
     void forceGlitch();
 
+    // Audio
+    void setAudioManager(AudioManager* audio) { m_audioManager = audio; }
+
 private:
     void renderStaticNoise(SDL_Renderer* renderer, int intensity);
     void renderScreenShake(SDL_Renderer* renderer);
@@ -26,6 +31,7 @@ private:
     void renderScanlines(SDL_Renderer* renderer);
 
     SDL_Renderer* m_renderer;
+    AudioManager* m_audioManager;
 
     // Glitch State
     bool m_isGlitching;
