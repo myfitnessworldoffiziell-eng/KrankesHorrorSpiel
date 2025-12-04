@@ -65,9 +65,9 @@ void Player::update(float deltaTime) {
     // Reset ground state (will be set by platform collision in Game.cpp)
     m_onGround = false;
 
-    // Screen Bounds
+    // Level Bounds (levels are 2400px wide)
     if (m_x < 0.0f) m_x = 0.0f;
-    if (m_x > 800.0f - m_width) m_x = 800.0f - m_width;
+    if (m_x > 2400.0f - m_width) m_x = 2400.0f - m_width;
 
     // Fallback: prevent falling off screen
     if (m_y > 600.0f) {

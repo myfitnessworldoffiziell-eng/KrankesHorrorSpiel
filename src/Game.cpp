@@ -78,11 +78,18 @@ bool Game::initialize() {
     }
 
     // SDL_mixer initialisieren
+    // Initialize MP3 support
+    int mixFlags = MIX_INIT_MP3 | MIX_INIT_OGG;
+    if ((Mix_Init(mixFlags) & mixFlags) != mixFlags) {
+        std::cerr << "⚠️ SDL_mixer: Some audio formats not available: " << Mix_GetError() << std::endl;
+        std::cerr << "   Continuing anyway..." << std::endl;
+    }
+
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         std::cerr << "SDL_mixer konnte nicht initialisiert werden: " << Mix_GetError() << std::endl;
         return false;
     }
-    std::cout << "✓ SDL_mixer initialized: 44100 Hz, 2 channels, 2048 buffer" << std::endl;
+    std::cout << "✓ SDL_mixer initialized: 44100 Hz, 2 channels, 2048 buffer (MP3+OGG support)" << std::endl;
 
     // SDL_ttf initialisieren
     if (TTF_Init() == -1) {
