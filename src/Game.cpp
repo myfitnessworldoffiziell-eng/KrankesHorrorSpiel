@@ -290,12 +290,12 @@ void Game::handleEvents() {
                 // Handle game over input
                 if (event.type == SDL_KEYDOWN) {
                     if (event.key.keysym.sym == SDLK_SPACE) {
-                        // Respawn player
-                        std::cout << "[Game] Player respawning..." << std::endl;
+                        // Respawn player in SAME level with FULL health
+                        std::cout << "[Game] Player respawning in Level " << m_currentLevel << "..." << std::endl;
 
-                        // Reset player
+                        // FULL player reset (health + state)
+                        m_player->reset();
                         m_player->setPosition(50.0f, 400.0f);
-                        m_player->takeDamage(-100);  // Restore health
 
                         // Reset level-specific horror triggers
                         m_level3HorrorTriggered = false;
@@ -308,7 +308,7 @@ void Game::handleEvents() {
                         m_level10ExtremeTriggered = false;
                         m_levelHorrorTimer = 0.0f;
 
-                        // Reload level
+                        // Reload CURRENT level (not Level 1!)
                         m_level->loadLevel(m_currentLevel, m_audioManager.get());
 
                         // Reset game over screen
@@ -320,8 +320,10 @@ void Game::handleEvents() {
                         // Resume normal music
                         m_audioManager->playMusic("level");
                     } else if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        // Quit to menu
+                        // Quit to menu - RESET player for next game
                         std::cout << "[Game] Player quit from game over." << std::endl;
+                        m_player->reset();  // Reset player state
+                        m_currentLevel = 1;  // Reset to level 1
                         setState(GameState::MAIN_MENU);
                         m_gameOverScreen->reset();
                         m_audioManager->playMusic("menu");
@@ -1097,13 +1099,28 @@ void Game::setState(GameState newState) {
 
         case GameState::PLAYING:
             if (oldState == GameState::MAIN_MENU) {
-                // Start new game
+                // Start new game - FULL reset!
                 m_currentLevel = 1;
                 m_collectedCodeFragments.clear();
                 m_activeNPC = nullptr;
+
+                // FULL player reset (health + all state)
+                m_player->reset();
+                m_player->setPosition(50.0f, 400.0f);
+
+                // Reset all horror triggers
+                m_level3HorrorTriggered = false;
+                m_level5HorrorTriggered = false;
+                m_level7HorrorTriggered = false;
+                m_level9HorrorTriggered = false;
+                m_level4ExtremeTriggered = false;
+                m_level6ExtremeTriggered = false;
+                m_level8ExtremeTriggered = false;
+                m_level10ExtremeTriggered = false;
+                m_levelHorrorTimer = 0.0f;
+
                 m_audioManager->playMusic("level");
                 m_level->loadLevel(m_currentLevel, m_audioManager.get());  // Load Level 1
-                m_player->setPosition(50.0f, 400.0f);         // Reset player position
                 std::cout << "[Game] Started new game - Level 1: Welcome to Paradise" << std::endl;
             } else if (oldState == GameState::PAUSED) {
                 m_audioManager->resumeMusic();

@@ -143,6 +143,21 @@ void Player::kill() {
     }
 }
 
+void Player::reset() {
+    // Reset health to maximum
+    m_health = m_maxHealth;
+
+    // Reset velocities
+    m_velocityX = 0.0f;
+    m_velocityY = 0.0f;
+
+    // Reset state flags
+    m_onGround = false;
+    m_invulnerable = false;
+    m_invulnerabilityTimer = 0.0f;
+    m_animationTimer = 0.0f;
+}
+
 SDL_Rect Player::getBounds() const {
     return {
         static_cast<int>(m_x),

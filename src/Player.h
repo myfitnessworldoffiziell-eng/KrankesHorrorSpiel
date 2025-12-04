@@ -20,6 +20,7 @@ public:
     // Health & Death
     void takeDamage(int damage);
     void kill();  // Instant death (spike ball, etc.)
+    void reset();  // Full reset (health + state)
     bool isAlive() const { return m_health > 0; }
     int getHealth() const { return m_health; }
     int getMaxHealth() const { return m_maxHealth; }
