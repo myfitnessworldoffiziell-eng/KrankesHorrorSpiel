@@ -72,8 +72,8 @@ void CorruptionSystem::forceGlitch() {
     m_isGlitching = true;
     m_glitchTimer = 0.0f;
 
-    // Shorter, more intense glitches (0.05-0.15 seconds)
-    std::uniform_real_distribution<> durationDis(0.05, 0.15);
+    // VERY short but INTENSE glitches (0.03-0.08 seconds for quick flash)
+    std::uniform_real_distribution<> durationDis(0.03, 0.08);
     m_glitchDuration = static_cast<float>(durationDis(m_rng));
 
     std::cout << "[Corruption] 👻 GLITCH! Duration: " << m_glitchDuration << "s" << std::endl;
@@ -87,46 +87,72 @@ void CorruptionSystem::forceGlitch() {
 void CorruptionSystem::renderStaticNoise(SDL_Renderer* renderer, int intensity) {
     std::uniform_int_distribution<> posDis(0, 800);
     std::uniform_int_distribution<> colorDis(0, 255);
+    std::uniform_int_distribution<> colorType(0, 2);  // Color or grayscale
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-    // More intense static noise (20x instead of 10x)
-    for (int i = 0; i < intensity * 20; ++i) {
+    // MUCH MORE INTENSE static noise (50x for crazy effect)
+    for (int i = 0; i < intensity * 50; ++i) {
         int x = posDis(m_rng);
         int y = posDis(m_rng);
-        int gray = colorDis(m_rng);
 
-        // More opaque for more visible static (150 instead of 100)
-        SDL_SetRenderDrawColor(renderer, gray, gray, gray, 150);
+        if (colorType(m_rng) == 0) {
+            // Colorful glitch pixels (RGB)
+            int r = colorDis(m_rng);
+            int g = colorDis(m_rng);
+            int b = colorDis(m_rng);
+            SDL_SetRenderDrawColor(renderer, r, g, b, 200);
+        } else {
+            // Grayscale for contrast
+            int gray = colorDis(m_rng);
+            SDL_SetRenderDrawColor(renderer, gray, gray, gray, 180);
+        }
         SDL_RenderDrawPoint(renderer, x, y);
+    }
+
+    // Add some glitch lines for extra effect
+    std::uniform_int_distribution<> lineDis(0, 600);
+    for (int i = 0; i < intensity / 5; ++i) {
+        int y = lineDis(m_rng);
+        int r = colorDis(m_rng);
+        int g = colorDis(m_rng);
+        int b = colorDis(m_rng);
+        SDL_SetRenderDrawColor(renderer, r, g, b, 150);
+        SDL_RenderDrawLine(renderer, 0, y, 800, y);
     }
 }
 
 void CorruptionSystem::renderColorDistortion(SDL_Renderer* renderer) {
-    // Intense RGB-Shift with varied colors
+    // INTENSE RGB-Shift with crazy colors
     std::uniform_int_distribution<> posDis(0, 800);
-    std::uniform_int_distribution<> sizeDis(10, 100);  // Larger rectangles
-    std::uniform_int_distribution<> colorChoice(0, 5);  // 6 different color types
+    std::uniform_int_distribution<> sizeDis(20, 200);  // MUCH larger rectangles
+    std::uniform_int_distribution<> colorChoice(0, 8);  // More color variations
+    std::uniform_int_distribution<> alphaDis(100, 180);  // Variable transparency
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 
-    // More rectangles for more intense effect (15 instead of 5)
-    for (int i = 0; i < 15; ++i) {
+    // MANY MORE rectangles for INTENSE effect (40 instead of 15!)
+    for (int i = 0; i < 40; ++i) {
         SDL_Rect rect;
         rect.x = posDis(m_rng);
         rect.y = posDis(m_rng);
         rect.w = sizeDis(m_rng);
         rect.h = sizeDis(m_rng);
 
-        // Random color choice for variety
+        int alpha = alphaDis(m_rng);
+
+        // More intense color choices
         int color = colorChoice(m_rng);
         switch (color) {
-            case 0: SDL_SetRenderDrawColor(renderer, 255, 0, 0, 80);   break; // Red
-            case 1: SDL_SetRenderDrawColor(renderer, 0, 255, 0, 80);   break; // Green
-            case 2: SDL_SetRenderDrawColor(renderer, 0, 0, 255, 80);   break; // Blue
-            case 3: SDL_SetRenderDrawColor(renderer, 255, 255, 0, 80); break; // Yellow
-            case 4: SDL_SetRenderDrawColor(renderer, 255, 0, 255, 80); break; // Magenta
-            case 5: SDL_SetRenderDrawColor(renderer, 0, 255, 255, 80); break; // Cyan
+            case 0: SDL_SetRenderDrawColor(renderer, 255, 0, 0, alpha);     break; // Bright Red
+            case 1: SDL_SetRenderDrawColor(renderer, 0, 255, 0, alpha);     break; // Bright Green
+            case 2: SDL_SetRenderDrawColor(renderer, 0, 0, 255, alpha);     break; // Bright Blue
+            case 3: SDL_SetRenderDrawColor(renderer, 255, 255, 0, alpha);   break; // Yellow
+            case 4: SDL_SetRenderDrawColor(renderer, 255, 0, 255, alpha);   break; // Magenta
+            case 5: SDL_SetRenderDrawColor(renderer, 0, 255, 255, alpha);   break; // Cyan
+            case 6: SDL_SetRenderDrawColor(renderer, 255, 128, 0, alpha);   break; // Orange
+            case 7: SDL_SetRenderDrawColor(renderer, 128, 0, 255, alpha);   break; // Purple
+            case 8: SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha); break; // White flash
         }
         SDL_RenderFillRect(renderer, &rect);
 

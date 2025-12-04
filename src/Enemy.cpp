@@ -255,7 +255,7 @@ void GlitchSlime::update(float deltaTime) {
 void GlitchSlime::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     if (!m_alive) return;
 
-    // Glitchy magenta slime
+    // === ENHANCED GLITCH SLIME ===
     SDL_Rect body = {
         static_cast<int>(m_x - cameraX + m_offsetX),
         static_cast<int>(m_y - cameraY + m_offsetY),
@@ -263,25 +263,56 @@ void GlitchSlime::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
         static_cast<int>(m_height)
     };
 
-    // Magenta (glitch color)
+    // Glitch aura (pulsing)
+    static float glitchPulse = 0.0f;
+    glitchPulse += 0.1f;
+    int pulseOffset = static_cast<int>(sin(glitchPulse) * 3);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 100);
+    SDL_Rect aura = {body.x - 4 + pulseOffset, body.y - 4 + pulseOffset, body.w + 8, body.h + 8};
+    SDL_RenderFillRect(renderer, &aura);
+
+    // Main body - gradient effect
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     SDL_RenderFillRect(renderer, &body);
-
-    // Double outline for glitch effect
     SDL_SetRenderDrawColor(renderer, 200, 0, 200, 255);
+    SDL_Rect innerBody = {body.x + 2, body.y + 2, body.w - 4, body.h - 4};
+    SDL_RenderFillRect(renderer, &innerBody);
+
+    // Triple outline for intense glitch effect
+    SDL_SetRenderDrawColor(renderer, 255, 100, 255, 255);
     SDL_Rect outline1 = {body.x - 1, body.y - 1, body.w + 2, body.h + 2};
     SDL_RenderDrawRect(renderer, &outline1);
-
-    SDL_SetRenderDrawColor(renderer, 150, 0, 150, 255);
+    SDL_SetRenderDrawColor(renderer, 200, 0, 200, 255);
     SDL_Rect outline2 = {body.x - 2, body.y - 2, body.w + 4, body.h + 4};
     SDL_RenderDrawRect(renderer, &outline2);
+    SDL_SetRenderDrawColor(renderer, 150, 0, 150, 255);
+    SDL_Rect outline3 = {body.x - 3, body.y - 3, body.w + 6, body.h + 6};
+    SDL_RenderDrawRect(renderer, &outline3);
 
-    // Void eyes (black holes)
+    // Void eyes with glow (black holes)
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+    SDL_SetRenderDrawColor(renderer, 100, 0, 100, 150);
+    SDL_Rect leftEyeGlow = {static_cast<int>(m_x - cameraX + 4), static_cast<int>(m_y - cameraY + 6), 10, 10};
+    SDL_Rect rightEyeGlow = {static_cast<int>(m_x - cameraX + 18), static_cast<int>(m_y - cameraY + 6), 10, 10};
+    SDL_RenderFillRect(renderer, &leftEyeGlow);
+    SDL_RenderFillRect(renderer, &rightEyeGlow);
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_Rect leftEye = {static_cast<int>(m_x - cameraX + 6), static_cast<int>(m_y - cameraY + 8), 6, 6};
     SDL_Rect rightEye = {static_cast<int>(m_x - cameraX + 20), static_cast<int>(m_y - cameraY + 8), 6, 6};
     SDL_RenderFillRect(renderer, &leftEye);
     SDL_RenderFillRect(renderer, &rightEye);
+
+    // Digital particles around slime
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 200);
+    for (int i = 0; i < 5; ++i) {
+        int px = static_cast<int>(m_x - cameraX + (rand() % 32));
+        int py = static_cast<int>(m_y - cameraY + (rand() % 32));
+        SDL_RenderDrawPoint(renderer, px, py);
+    }
 }
 
 // ============================================
