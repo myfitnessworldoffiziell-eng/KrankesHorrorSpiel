@@ -155,13 +155,14 @@ bool Game::initialize() {
     m_audioManager->loadSound("chirp", "assets/audio/chirp.wav");
     m_audioManager->loadSound("zap", "assets/audio/zap.wav");
 
-    // Horror SFX (4 sounds)
+    // Horror SFX (5 sounds)
     m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.wav");
     m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.wav");
     m_audioManager->loadSound("scare_appear", "assets/audio/scare_appear.wav");
     m_audioManager->loadSound("scare_audio", "assets/audio/scare_audio.wav");
+    m_audioManager->loadSound("glitch", "assets/audio/glitch.wav");  // 👻 Procedurally generated glitch!
 
-    std::cout << "✓ Loaded 14 audio files (4 music + 10 SFX)" << std::endl;
+    std::cout << "✓ Loaded 15 audio files (4 music + 11 SFX)" << std::endl;
 
     m_isRunning = true;
     m_lastFrameTime = SDL_GetTicks();
