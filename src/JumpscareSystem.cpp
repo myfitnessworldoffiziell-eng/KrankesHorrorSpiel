@@ -54,7 +54,7 @@ void JumpscareSystem::triggerScare(ScareType type) {
         case ScareType::AUDIO_SPIKE:
             m_scareDuration = 0.2f;
             if (m_audioManager) {
-                m_audioManager->playSound("glitch", 128);  // Using glitch sound (scare_audio missing)
+                m_audioManager->playSound("scare_audio", 128);  // ✓ Scary audio spike!
             }
             std::cout << "[Jumpscare] AUDIO SPIKE!" << std::endl;
             break;

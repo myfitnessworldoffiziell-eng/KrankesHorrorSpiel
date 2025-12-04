@@ -166,14 +166,14 @@ bool Game::initialize() {
     m_audioManager->loadSound("chirp", "assets/audio/chirp.mp3");
     m_audioManager->loadSound("zap", "assets/audio/zap.mp3");
 
-    // Horror SFX (4 sounds)
+    // Horror SFX (5 sounds)
     m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.mp3");
     m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.mp3");
     m_audioManager->loadSound("scare_appear", "assets/audio/scare_appear.mp3");
-    // m_audioManager->loadSound("scare_audio", "assets/audio/scare_audio.mp3");  // TODO: Missing file
+    m_audioManager->loadSound("scare_audio", "assets/audio/scare_audio.mp3");  // ✓ Now available!
     m_audioManager->loadSound("glitch", "assets/audio/glitch.mp3");
 
-    std::cout << "✓ Loaded 14 audio files (4 music + 10 SFX)" << std::endl;
+    std::cout << "✓ Loaded 15 audio files (4 music + 11 SFX)" << std::endl;
 
     // Set volume levels for proper audio mixing
     m_audioManager->setMusicVolume(48);   // ~37% - Background music should be subtle
@@ -1359,7 +1359,7 @@ void Game::advanceToNextLevel() {
             m_dialogSystem->addDialog("", "I'm with you. Forever.", 0.0f);
 
             // Play horror sound
-            m_audioManager->playSound("glitch", 100);  // Using glitch sound (scare_audio missing)
+            m_audioManager->playSound("scare_audio", 128);  // ✓ Creepy ending audio!
         } else {
             // ENDING A: The Cycle Continues (Normal ending)
             std::cout << "[Game] ENDING A: The Cycle Continues" << std::endl;
