@@ -367,71 +367,112 @@ void Level::createLevel1(AudioManager* audioManager) {
     m_backgroundColor[1] = 206.0f;
     m_backgroundColor[2] = 250.0f;
 
-    // Platforms - Extended level with varied materials (type: 0=grass, 1=stone, 2=metal, 3=wood)
-    m_platforms.push_back({0.0f, 550.0f, 300.0f, 50.0f, 0});      // Ground - grass
-    m_platforms.push_back({300.0f, 550.0f, 200.0f, 50.0f, 1});    // Ground - stone
-    m_platforms.push_back({500.0f, 550.0f, 300.0f, 50.0f, 0});    // Ground - grass
+    // Platforms - 3x EXTENDED level (2400px wide) with varied materials (type: 0=grass, 1=stone, 2=metal, 3=wood)
+    // Ground floor - continuous across entire level
+    m_platforms.push_back({0.0f, 550.0f, 600.0f, 50.0f, 0});      // Ground section 1 - grass
+    m_platforms.push_back({600.0f, 550.0f, 400.0f, 50.0f, 1});    // Ground section 2 - stone
+    m_platforms.push_back({1000.0f, 550.0f, 600.0f, 50.0f, 0});   // Ground section 3 - grass
+    m_platforms.push_back({1600.0f, 550.0f, 400.0f, 50.0f, 3});   // Ground section 4 - wood
+    m_platforms.push_back({2000.0f, 550.0f, 400.0f, 50.0f, 0});   // Ground section 5 - grass
 
-    // First section - grass platforms
-    m_platforms.push_back({150.0f, 450.0f, 120.0f, 20.0f, 0});    // Grass platform
-    m_platforms.push_back({320.0f, 400.0f, 100.0f, 20.0f, 0});    // Grass platform
-    m_platforms.push_back({470.0f, 480.0f, 140.0f, 20.0f, 0});    // Grass platform
-    m_platforms.push_back({650.0f, 420.0f, 100.0f, 20.0f, 3});    // Wood platform
+    // First section (0-800) - grass platforms
+    m_platforms.push_back({150.0f, 450.0f, 120.0f, 20.0f, 0});
+    m_platforms.push_back({320.0f, 400.0f, 100.0f, 20.0f, 0});
+    m_platforms.push_back({470.0f, 480.0f, 140.0f, 20.0f, 0});
+    m_platforms.push_back({650.0f, 420.0f, 100.0f, 20.0f, 3});
 
-    // Middle section - stone and wood mix
-    m_platforms.push_back({100.0f, 350.0f, 80.0f, 20.0f, 1});     // Stone platform
-    m_platforms.push_back({250.0f, 300.0f, 90.0f, 20.0f, 3});     // Wood platform
-    m_platforms.push_back({400.0f, 330.0f, 110.0f, 20.0f, 1});    // Stone platform
-    m_platforms.push_back({560.0f, 360.0f, 100.0f, 20.0f, 3});    // Wood platform
+    // Second section (800-1600) - stone and metal mix
+    m_platforms.push_back({850.0f, 450.0f, 130.0f, 20.0f, 1});
+    m_platforms.push_back({1020.0f, 400.0f, 110.0f, 20.0f, 2});
+    m_platforms.push_back({1170.0f, 480.0f, 150.0f, 20.0f, 1});
+    m_platforms.push_back({1350.0f, 420.0f, 120.0f, 20.0f, 2});
+    m_platforms.push_back({1520.0f, 350.0f, 100.0f, 20.0f, 3});
 
-    // Upper section - challenging jumps
-    m_platforms.push_back({180.0f, 230.0f, 70.0f, 15.0f, 2});     // Metal platform
-    m_platforms.push_back({320.0f, 200.0f, 80.0f, 15.0f, 2});     // Metal platform
-    m_platforms.push_back({480.0f, 250.0f, 90.0f, 15.0f, 3});     // Wood platform
-    m_platforms.push_back({640.0f, 280.0f, 120.0f, 20.0f, 1});    // Stone platform
+    // Third section (1600-2400) - challenging upper platforms
+    m_platforms.push_back({1700.0f, 480.0f, 140.0f, 20.0f, 3});
+    m_platforms.push_back({1880.0f, 420.0f, 120.0f, 20.0f, 2});
+    m_platforms.push_back({2040.0f, 380.0f, 130.0f, 20.0f, 1});
+    m_platforms.push_back({2220.0f, 450.0f, 150.0f, 20.0f, 0});
 
-    // Background Decorations - Make it look alive!
-    // Sky clouds
+    // Middle height platforms across all sections
+    m_platforms.push_back({250.0f, 300.0f, 90.0f, 20.0f, 3});
+    m_platforms.push_back({550.0f, 330.0f, 100.0f, 20.0f, 1});
+    m_platforms.push_back({900.0f, 310.0f, 95.0f, 20.0f, 2});
+    m_platforms.push_back({1200.0f, 290.0f, 110.0f, 20.0f, 3});
+    m_platforms.push_back({1500.0f, 270.0f, 100.0f, 20.0f, 1});
+    m_platforms.push_back({1800.0f, 300.0f, 120.0f, 20.0f, 2});
+    m_platforms.push_back({2100.0f, 280.0f, 130.0f, 20.0f, 3});
+
+    // Upper challenging jumps
+    m_platforms.push_back({320.0f, 200.0f, 80.0f, 15.0f, 2});
+    m_platforms.push_back({750.0f, 220.0f, 85.0f, 15.0f, 2});
+    m_platforms.push_back({1050.0f, 180.0f, 90.0f, 15.0f, 2});
+    m_platforms.push_back({1400.0f, 200.0f, 95.0f, 15.0f, 2});
+    m_platforms.push_back({1750.0f, 220.0f, 100.0f, 15.0f, 2});
+    m_platforms.push_back({2050.0f, 190.0f, 110.0f, 15.0f, 2};
+
+    // Background Decorations - 3x EXTENDED across 2400px!
+    // Sky clouds - distributed across entire level
     m_decorations.push_back({50.0f, 30.0f, 80.0f, 30.0f, DecorationType::CLOUD, 0});
-    m_decorations.push_back({200.0f, 50.0f, 100.0f, 35.0f, DecorationType::CLOUD, 1});
-    m_decorations.push_back({450.0f, 40.0f, 90.0f, 32.0f, DecorationType::CLOUD, 0});
-    m_decorations.push_back({650.0f, 60.0f, 110.0f, 38.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({300.0f, 50.0f, 100.0f, 35.0f, DecorationType::CLOUD, 1});
+    m_decorations.push_back({600.0f, 40.0f, 90.0f, 32.0f, DecorationType::CLOUD, 0});
+    m_decorations.push_back({900.0f, 60.0f, 110.0f, 38.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({1200.0f, 35.0f, 95.0f, 33.0f, DecorationType::CLOUD, 1});
+    m_decorations.push_back({1500.0f, 55.0f, 105.0f, 36.0f, DecorationType::CLOUD, 0});
+    m_decorations.push_back({1800.0f, 45.0f, 100.0f, 34.0f, DecorationType::CLOUD, 2});
+    m_decorations.push_back({2100.0f, 65.0f, 115.0f, 40.0f, DecorationType::CLOUD, 1});
 
-    // Ground decorations - trees
+    // Ground decorations - trees every ~300px
     m_decorations.push_back({20.0f, 490.0f, 40.0f, 60.0f, DecorationType::TREE, 0});
-    m_decorations.push_back({280.0f, 490.0f, 45.0f, 60.0f, DecorationType::TREE, 1});
-    m_decorations.push_back({620.0f, 490.0f, 50.0f, 60.0f, DecorationType::TREE, 2});
-    m_decorations.push_back({720.0f, 490.0f, 40.0f, 55.0f, DecorationType::TREE, 0});
+    m_decorations.push_back({350.0f, 490.0f, 45.0f, 60.0f, DecorationType::TREE, 1});
+    m_decorations.push_back({680.0f, 490.0f, 50.0f, 60.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({950.0f, 490.0f, 40.0f, 55.0f, DecorationType::TREE, 0});
+    m_decorations.push_back({1280.0f, 490.0f, 45.0f, 60.0f, DecorationType::TREE, 1});
+    m_decorations.push_back({1620.0f, 490.0f, 50.0f, 60.0f, DecorationType::TREE, 2});
+    m_decorations.push_back({1950.0f, 490.0f, 40.0f, 55.0f, DecorationType::TREE, 0});
+    m_decorations.push_back({2280.0f, 490.0f, 45.0f, 60.0f, DecorationType::TREE, 1});
 
-    // Bushes scattered around
+    // Bushes scattered throughout
     m_decorations.push_back({100.0f, 530.0f, 30.0f, 20.0f, DecorationType::BUSH, 0});
-    m_decorations.push_back({220.0f, 530.0f, 35.0f, 22.0f, DecorationType::BUSH, 1});
-    m_decorations.push_back({380.0f, 530.0f, 28.0f, 20.0f, DecorationType::BUSH, 2});
-    m_decorations.push_back({540.0f, 530.0f, 32.0f, 20.0f, DecorationType::BUSH, 0});
+    m_decorations.push_back({280.0f, 530.0f, 35.0f, 22.0f, DecorationType::BUSH, 1});
+    m_decorations.push_back({520.0f, 530.0f, 28.0f, 20.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({780.0f, 530.0f, 32.0f, 20.0f, DecorationType::BUSH, 0});
+    m_decorations.push_back({1050.0f, 530.0f, 30.0f, 20.0f, DecorationType::BUSH, 1});
+    m_decorations.push_back({1350.0f, 530.0f, 35.0f, 22.0f, DecorationType::BUSH, 2});
+    m_decorations.push_back({1650.0f, 530.0f, 28.0f, 20.0f, DecorationType::BUSH, 0});
+    m_decorations.push_back({1920.0f, 530.0f, 32.0f, 20.0f, DecorationType::BUSH, 1});
+    m_decorations.push_back({2200.0f, 530.0f, 30.0f, 20.0f, DecorationType::BUSH, 2});
 
     // Rocks for variety
     m_decorations.push_back({60.0f, 535.0f, 25.0f, 15.0f, DecorationType::ROCK, 0});
-    m_decorations.push_back({340.0f, 535.0f, 30.0f, 18.0f, DecorationType::ROCK, 1});
-    m_decorations.push_back({480.0f, 535.0f, 28.0f, 16.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({450.0f, 535.0f, 30.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({850.0f, 535.0f, 28.0f, 16.0f, DecorationType::ROCK, 2});
+    m_decorations.push_back({1250.0f, 535.0f, 25.0f, 15.0f, DecorationType::ROCK, 0});
+    m_decorations.push_back({1650.0f, 535.0f, 30.0f, 18.0f, DecorationType::ROCK, 1});
+    m_decorations.push_back({2050.0f, 535.0f, 28.0f, 16.0f, DecorationType::ROCK, 2});
 
-    // Flowers for color
-    m_decorations.push_back({140.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, 0});
-    m_decorations.push_back({160.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, 1});
-    m_decorations.push_back({180.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, 2});
-    m_decorations.push_back({420.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, 1});
-    m_decorations.push_back({440.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, 0});
+    // Flowers for color - clusters throughout
+    for (int cluster = 0; cluster < 8; cluster++) {
+        float baseX = 140.0f + (cluster * 300.0f);
+        m_decorations.push_back({baseX, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, cluster % 3});
+        m_decorations.push_back({baseX + 20.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, (cluster + 1) % 3});
+        m_decorations.push_back({baseX + 40.0f, 540.0f, 8.0f, 10.0f, DecorationType::FLOWER, (cluster + 2) % 3});
+    }
 
-    // Grass tufts for detail
-    m_decorations.push_back({80.0f, 540.0f, 10.0f, 10.0f, DecorationType::GRASS_TUFT, 0});
-    m_decorations.push_back({200.0f, 540.0f, 10.0f, 10.0f, DecorationType::GRASS_TUFT, 0});
-    m_decorations.push_back({320.0f, 540.0f, 10.0f, 10.0f, DecorationType::GRASS_TUFT, 0});
-    m_decorations.push_back({500.0f, 540.0f, 10.0f, 10.0f, DecorationType::GRASS_TUFT, 0});
-    m_decorations.push_back({600.0f, 540.0f, 10.0f, 10.0f, DecorationType::GRASS_TUFT, 0});
+    // Grass tufts for detail - every ~200px
+    for (int i = 0; i < 12; i++) {
+        m_decorations.push_back({80.0f + (i * 200.0f), 540.0f, 10.0f, 10.0f, DecorationType::GRASS_TUFT, 0});
+    }
 
-    // Enemies - same as before but adjusted positions
+    // Enemies - distributed across 2400px level
     m_enemies.push_back(std::make_unique<GreenSlime>(300.0f, 518.0f, audioManager));
-    m_enemies.push_back(std::make_unique<GreenSlime>(600.0f, 518.0f, audioManager));
+    m_enemies.push_back(std::make_unique<GreenSlime>(700.0f, 518.0f, audioManager));
+    m_enemies.push_back(std::make_unique<GreenSlime>(1100.0f, 518.0f, audioManager));
+    m_enemies.push_back(std::make_unique<GreenSlime>(1500.0f, 518.0f, audioManager));
+    m_enemies.push_back(std::make_unique<GreenSlime>(1900.0f, 518.0f, audioManager));
     m_enemies.push_back(std::make_unique<BlueBird>(400.0f, 250.0f, 200.0f, 600.0f, audioManager));
+    m_enemies.push_back(std::make_unique<BlueBird>(1000.0f, 250.0f, 800.0f, 1400.0f, audioManager));
+    m_enemies.push_back(std::make_unique<BlueBird>(1700.0f, 250.0f, 1500.0f, 2100.0f, audioManager));
 
     // Tutorial NPC
     auto tutorialNPC = std::make_unique<NPC>(50.0f, 500.0f, NPCType::FRIENDLY, audioManager);
@@ -439,19 +480,24 @@ void Level::createLevel1(AudioManager* audioManager) {
     tutorialNPC->addDialogue("Use WASD or Arrow Keys to move");
     tutorialNPC->addDialogue("Press SPACE to jump");
     tutorialNPC->addDialogue("Collect all stars to unlock the exit!");
+    tutorialNPC->addDialogue("The level is 3x longer now - explore!");
     m_npcs.push_back(std::move(tutorialNPC));
 
-    // Stars - more spread out across extended level
-    m_stars.push_back({200.0f, 420.0f, false});     // First section
-    m_stars.push_back({360.0f, 350.0f, false});     // Middle low
-    m_stars.push_back({520.0f, 450.0f, false});     // Right section
-    m_stars.push_back({690.0f, 390.0f, false});     // Upper right
-    m_stars.push_back({230.0f, 270.0f, false});     // High left
-    m_stars.push_back({370.0f, 170.0f, false});     // Very high center
-    m_stars.push_back({530.0f, 220.0f, false});     // High right
+    // Stars - spread across entire 2400px level
+    m_stars.push_back({200.0f, 420.0f, false});      // Section 1
+    m_stars.push_back({360.0f, 350.0f, false});
+    m_stars.push_back({370.0f, 170.0f, false});      // High
+    m_stars.push_back({700.0f, 390.0f, false});      // Section 2
+    m_stars.push_back({900.0f, 280.0f, false});
+    m_stars.push_back({1050.0f, 150.0f, false});     // Very high
+    m_stars.push_back({1300.0f, 260.0f, false});     // Section 3
+    m_stars.push_back({1550.0f, 330.0f, false});
+    m_stars.push_back({1750.0f, 190.0f, false});     // High
+    m_stars.push_back({2000.0f, 350.0f, false});     // Section 4
+    m_stars.push_back({2150.0f, 250.0f, false});
 
-    // Goal portal at the end
-    m_goal = {730.0f, 450.0f, 40.0f, 60.0f, false};
+    // Goal portal at the far end (2300px)
+    m_goal = {2300.0f, 450.0f, 40.0f, 60.0f, false};
 }
 
 // ========================================
