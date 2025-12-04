@@ -33,7 +33,7 @@ public:
     ~GlitchBoss() override;
 
     void update(float deltaTime, Player* player) override;
-    void render(SDL_Renderer* renderer) override;
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) override;
 
     // Override phase transitions
     void transitionToPhase(BossPhase newPhase) override;

@@ -409,7 +409,7 @@ void Level::createLevel1(AudioManager* audioManager) {
     m_platforms.push_back({1050.0f, 180.0f, 90.0f, 15.0f, 2});
     m_platforms.push_back({1400.0f, 200.0f, 95.0f, 15.0f, 2});
     m_platforms.push_back({1750.0f, 220.0f, 100.0f, 15.0f, 2});
-    m_platforms.push_back({2050.0f, 190.0f, 110.0f, 15.0f, 2};
+    m_platforms.push_back({2050.0f, 190.0f, 110.0f, 15.0f, 2});
 
     // Background Decorations - 3x EXTENDED across 2400px!
     // Sky clouds - distributed across entire level

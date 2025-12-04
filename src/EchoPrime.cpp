@@ -262,7 +262,7 @@ void EchoPrime::transitionToPhase(BossPhase newPhase) {
               << " - \"" << m_currentDialogue << "\"" << std::endl;
 }
 
-void EchoPrime::render(SDL_Renderer* renderer) {
+void EchoPrime::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     if (!isAlive()) return;
 
     // Choose rendering based on phase

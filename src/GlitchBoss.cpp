@@ -229,7 +229,7 @@ void GlitchBoss::transitionToPhase(BossPhase newPhase) {
     std::cout << "[GlitchBoss] Phase transition: " << static_cast<int>(newPhase) << std::endl;
 }
 
-void GlitchBoss::render(SDL_Renderer* renderer) {
+void GlitchBoss::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     if (!isAlive()) return;
 
     int renderX = static_cast<int>(m_x + m_glitchOffsetX);
