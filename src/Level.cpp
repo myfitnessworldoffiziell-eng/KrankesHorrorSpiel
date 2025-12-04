@@ -78,13 +78,143 @@ void Level::update(float deltaTime, Player* player) {
 }
 
 void Level::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
-    // Background
-    SDL_SetRenderDrawColor(renderer,
-        static_cast<int>(m_backgroundColor[0]),
-        static_cast<int>(m_backgroundColor[1]),
-        static_cast<int>(m_backgroundColor[2]),
-        255);
-    SDL_RenderClear(renderer);
+    // ===== ENHANCED BACKGROUND WITH GRADIENT =====
+
+    // Sky gradient (top to bottom)
+    int skyTopR = static_cast<int>(m_backgroundColor[0] * 0.7f);
+    int skyTopG = static_cast<int>(m_backgroundColor[1] * 0.8f);
+    int skyTopB = static_cast<int>(m_backgroundColor[2]);
+
+    int skyBottomR = static_cast<int>(m_backgroundColor[0] * 1.2f);
+    int skyBottomG = static_cast<int>(m_backgroundColor[1] * 1.1f);
+    int skyBottomB = static_cast<int>(m_backgroundColor[2] * 0.9f);
+
+    // Clamp values
+    skyTopR = std::min(255, skyTopR);
+    skyTopG = std::min(255, skyTopG);
+    skyTopB = std::min(255, skyTopB);
+    skyBottomR = std::min(255, skyBottomR);
+    skyBottomG = std::min(255, skyBottomG);
+    skyBottomB = std::min(255, skyBottomB);
+
+    // Draw gradient sky (line by line)
+    for (int y = 0; y < 600; ++y) {
+        float ratio = static_cast<float>(y) / 600.0f;
+        int r = skyTopR + static_cast<int>((skyBottomR - skyTopR) * ratio);
+        int g = skyTopG + static_cast<int>((skyBottomG - skyTopG) * ratio);
+        int b = skyTopB + static_cast<int>((skyBottomB - skyTopB) * ratio);
+        SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+        SDL_RenderDrawLine(renderer, 0, y, 800, y);
+    }
+
+    // Far background stars/particles (parallax layer 1 - very slow)
+    static float starTwinkle = 0.0f;
+    starTwinkle += 0.02f;
+    for (int i = 0; i < 30; ++i) {
+        int starX = (i * 73 + 100) % 2400;  // Distributed across level
+        int starY = (i * 37 + 50) % 400;     // Upper part of sky
+
+        // Parallax: stars move slower (0.1x camera speed)
+        int screenX = starX - static_cast<int>(cameraX * 0.1f);
+        screenX = ((screenX % 2400) + 2400) % 2400;  // Wrap around
+
+        if (screenX >= -50 && screenX <= 850) {
+            // Twinkling effect
+            int twinkleOffset = static_cast<int>(sin(starTwinkle + i * 0.5f) * 50);
+            int alpha = 150 + twinkleOffset;
+            alpha = std::max(100, std::min(255, alpha));
+
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, alpha);
+            SDL_RenderDrawPoint(renderer, screenX, starY);
+            SDL_RenderDrawPoint(renderer, screenX + 1, starY);
+            SDL_RenderDrawPoint(renderer, screenX, starY + 1);
+        }
+    }
+
+    // Mountain/hill silhouettes (parallax layer 2 - slow)
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    for (int i = 0; i < 5; ++i) {
+        int hillX = i * 500 - 200;
+        int parallaxX = hillX - static_cast<int>(cameraX * 0.3f);
+
+        // Simple triangular hills
+        SDL_SetRenderDrawColor(renderer,
+            static_cast<int>(m_backgroundColor[0] * 0.5f),
+            static_cast<int>(m_backgroundColor[1] * 0.6f),
+            static_cast<int>(m_backgroundColor[2] * 0.7f),
+            200);
+
+        for (int h = 0; h < 150; ++h) {
+            int width = (150 - h) * 2;
+            SDL_RenderDrawLine(renderer,
+                parallaxX - width / 2, 450 + h,
+                parallaxX + width / 2, 450 + h);
+        }
+    }
+
+    // Floating clouds (parallax layer 2.5 - medium speed)
+    static float cloudDrift = 0.0f;
+    cloudDrift += 0.5f;  // Slow continuous drift
+    for (int i = 0; i < 8; ++i) {
+        int cloudX = static_cast<int>((i * 350.0f + cloudDrift)) % 2800 - 400;
+        int cloudY = 100 + (i * 31) % 200;
+        int parallaxCloudX = cloudX - static_cast<int>(cameraX * 0.5f);
+
+        // Multi-circle clouds for fluffy look
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 100);
+        for (int c = 0; c < 3; ++c) {
+            int cx = parallaxCloudX + c * 20 - 20;
+            int cy = cloudY + (c == 1 ? -5 : 0);
+            // Draw cloud circles as rectangles (simple approach)
+            SDL_Rect cloudCircle = {cx - 15, cy - 10, 30, 20};
+            SDL_RenderFillRect(renderer, &cloudCircle);
+        }
+    }
+
+    // Atmospheric fog layers (parallax layer 3 - faster)
+    static float fogWave = 0.0f;
+    fogWave += 0.03f;
+    for (int layer = 0; layer < 3; ++layer) {
+        float layerSpeed = 0.6f + layer * 0.2f;
+        int fogAlpha = 30 - layer * 8;
+
+        for (int i = 0; i < 6; ++i) {
+            int fogX = static_cast<int>((i * 400.0f + fogWave * 50.0f)) % 2800 - 400;
+            int fogY = 300 + layer * 100 + static_cast<int>(sin(fogWave + i) * 20);
+            int parallaxFogX = fogX - static_cast<int>(cameraX * layerSpeed);
+
+            SDL_SetRenderDrawColor(renderer, 200, 200, 220, fogAlpha);
+            SDL_Rect fogRect = {parallaxFogX, fogY, 200, 50};
+            SDL_RenderFillRect(renderer, &fogRect);
+        }
+    }
+
+    // Floating particles/dust (foreground - fast parallax 1.5x)
+    static float particleDrift = 0.0f;
+    particleDrift += 0.8f;
+    for (int i = 0; i < 40; ++i) {
+        float particleX = (i * 67.0f + particleDrift) % 2400.0f;
+        float particleY = (i * 43.0f + sin(particleDrift * 0.05f + i) * 50.0f);
+        if (particleY < 0) particleY += 600.0f;
+        if (particleY > 600) particleY -= 600.0f;
+
+        // Fast parallax (1.5x camera speed for foreground depth)
+        int screenX = static_cast<int>(particleX - cameraX * 1.5f);
+        screenX = ((screenX % 2400) + 2400) % 2400;
+
+        if (screenX >= -10 && screenX <= 810) {
+            // Glowing particles
+            int pulseAlpha = 100 + static_cast<int>(sin(particleDrift * 0.1f + i * 0.3f) * 80);
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+            SDL_SetRenderDrawColor(renderer, 200, 200, 255, pulseAlpha);
+            SDL_RenderDrawPoint(renderer, screenX, static_cast<int>(particleY));
+            // Small glow
+            SDL_SetRenderDrawColor(renderer, 150, 150, 200, pulseAlpha / 2);
+            SDL_RenderDrawPoint(renderer, screenX + 1, static_cast<int>(particleY));
+            SDL_RenderDrawPoint(renderer, screenX - 1, static_cast<int>(particleY));
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        }
+    }
 
     // Background Decorations (rendered before platforms for depth)
     for (const auto& deco : m_decorations) {
@@ -222,6 +352,74 @@ void Level::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
                 SDL_SetRenderDrawColor(renderer, 50, 100, 50, 255);
         }
         SDL_RenderDrawRect(renderer, &rect);
+
+        // ===== PLATFORM TEXTURE DETAILS =====
+        switch (platform.materialType) {
+            case 0: { // Grass - add grass blades on top
+                SDL_SetRenderDrawColor(renderer, 34, 139, 34, 255);
+                for (int g = 0; g < static_cast<int>(platform.width); g += 8) {
+                    int bladeHeight = 3 + (g % 4);
+                    SDL_RenderDrawLine(renderer,
+                        rect.x + g, rect.y,
+                        rect.x + g, rect.y - bladeHeight);
+                }
+                // Add dirt underneath
+                SDL_SetRenderDrawColor(renderer, 101, 67, 33, 180);
+                SDL_Rect dirt = {rect.x + 2, rect.y + rect.h - 3, rect.w - 4, 3};
+                SDL_RenderFillRect(renderer, &dirt);
+                break;
+            }
+            case 1: { // Stone - add cracks and texture
+                SDL_SetRenderDrawColor(renderer, 60, 60, 60, 255);
+                // Horizontal cracks
+                for (int c = 0; c < 3; ++c) {
+                    int crackY = rect.y + 3 + c * (rect.h / 4);
+                    int crackLen = 10 + (c * 7) % 20;
+                    SDL_RenderDrawLine(renderer,
+                        rect.x + 5 + (c * 13) % static_cast<int>(platform.width - 20), crackY,
+                        rect.x + 5 + (c * 13) % static_cast<int>(platform.width - 20) + crackLen, crackY);
+                }
+                // Stone spots (darker)
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                for (int s = 0; s < static_cast<int>(platform.width) / 20; ++s) {
+                    SDL_Rect spot = {rect.x + s * 20 + 5, rect.y + 4, 3, 3};
+                    SDL_RenderFillRect(renderer, &spot);
+                }
+                break;
+            }
+            case 2: { // Metal - add shine/reflections
+                // Top shine
+                SDL_SetRenderDrawColor(renderer, 220, 220, 220, 200);
+                SDL_RenderDrawLine(renderer, rect.x + 2, rect.y + 1, rect.x + rect.w - 2, rect.y + 1);
+                SDL_RenderDrawLine(renderer, rect.x + 2, rect.y + 2, rect.x + rect.w - 2, rect.y + 2);
+
+                // Metal rivets
+                SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+                for (int r = 0; r < static_cast<int>(platform.width) / 30; ++r) {
+                    SDL_Rect rivet = {rect.x + r * 30 + 5, rect.y + rect.h / 2, 3, 3};
+                    SDL_RenderFillRect(renderer, &rivet);
+                }
+
+                // Bottom shadow
+                SDL_SetRenderDrawColor(renderer, 80, 80, 80, 150);
+                SDL_RenderDrawLine(renderer, rect.x + 2, rect.y + rect.h - 2, rect.x + rect.w - 2, rect.y + rect.h - 2);
+                break;
+            }
+            case 3: { // Wood - add wood grain
+                SDL_SetRenderDrawColor(renderer, 101, 67, 33, 255);
+                // Vertical wood grain lines
+                for (int w = 0; w < static_cast<int>(platform.width); w += 15) {
+                    SDL_RenderDrawLine(renderer, rect.x + w, rect.y, rect.x + w, rect.y + rect.h);
+                }
+                // Wood knots (darker circles)
+                SDL_SetRenderDrawColor(renderer, 80, 50, 20, 255);
+                for (int k = 0; k < static_cast<int>(platform.width) / 40; ++k) {
+                    SDL_Rect knot = {rect.x + k * 40 + 10, rect.y + rect.h / 2 - 2, 4, 4};
+                    SDL_RenderFillRect(renderer, &knot);
+                }
+                break;
+            }
+        }
     }
 
     // Goal (exit portal) - only if active
