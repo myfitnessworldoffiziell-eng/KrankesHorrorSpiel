@@ -44,26 +44,26 @@ void NPC::update(float deltaTime) {
     }
 }
 
-void NPC::render(SDL_Renderer* renderer) {
+void NPC::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     switch (m_type) {
         case NPCType::FRIENDLY:
-            renderFriendly(renderer);
+            renderFriendly(renderer, cameraX, cameraY);
             break;
         case NPCType::CORRUPTED:
-            renderCorrupted(renderer);
+            renderCorrupted(renderer, cameraX, cameraY);
             break;
         case NPCType::TERMINAL:
-            renderTerminal(renderer);
+            renderTerminal(renderer, cameraX, cameraY);
             break;
         case NPCType::SUSPICIOUS:
-            renderSuspicious(renderer);
+            renderSuspicious(renderer, cameraX, cameraY);
             break;
     }
 
     // Indicator if player can interact (! above head)
     if (!m_isInteracting && hasDialogue()) {
-        int indicatorX = static_cast<int>(m_x + m_width / 2 - 4);
-        int indicatorY = static_cast<int>(m_y - 20 + std::sin(m_animTimer * 3.0f) * 3.0f);
+        int indicatorX = static_cast<int>(m_x - cameraX + m_width / 2 - 4);
+        int indicatorY = static_cast<int>(m_y - cameraY - 20 + std::sin(m_animTimer * 3.0f) * 3.0f);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
         SDL_Rect indicator = {indicatorX, indicatorY, 8, 12};
@@ -71,9 +71,9 @@ void NPC::render(SDL_Renderer* renderer) {
     }
 }
 
-void NPC::renderFriendly(SDL_Renderer* renderer) {
-    int x = static_cast<int>(m_x);
-    int y = static_cast<int>(m_y);
+void NPC::renderFriendly(SDL_Renderer* renderer, float cameraX, float cameraY) {
+    int x = static_cast<int>(m_x - cameraX);
+    int y = static_cast<int>(m_y - cameraY);
 
     // Body (green)
     SDL_SetRenderDrawColor(renderer, 100, 200, 100, 255);
@@ -97,9 +97,9 @@ void NPC::renderFriendly(SDL_Renderer* renderer) {
     SDL_RenderDrawRect(renderer, &body);
 }
 
-void NPC::renderCorrupted(SDL_Renderer* renderer) {
-    int x = static_cast<int>(m_x) + m_glitchOffsetX;
-    int y = static_cast<int>(m_y) + m_glitchOffsetY;
+void NPC::renderCorrupted(SDL_Renderer* renderer, float cameraX, float cameraY) {
+    int x = static_cast<int>(m_x - cameraX) + m_glitchOffsetX;
+    int y = static_cast<int>(m_y - cameraY) + m_glitchOffsetY;
 
     // Body (magenta/glitched)
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
@@ -125,9 +125,9 @@ void NPC::renderCorrupted(SDL_Renderer* renderer) {
     SDL_RenderFillRect(renderer, &glitch2);
 }
 
-void NPC::renderTerminal(SDL_Renderer* renderer) {
-    int x = static_cast<int>(m_x);
-    int y = static_cast<int>(m_y);
+void NPC::renderTerminal(SDL_Renderer* renderer, float cameraX, float cameraY) {
+    int x = static_cast<int>(m_x - cameraX);
+    int y = static_cast<int>(m_y - cameraY);
 
     // Monitor/Screen (dark gray)
     SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
@@ -156,9 +156,9 @@ void NPC::renderTerminal(SDL_Renderer* renderer) {
     SDL_RenderDrawRect(renderer, &monitor);
 }
 
-void NPC::renderSuspicious(SDL_Renderer* renderer) {
-    int x = static_cast<int>(m_x);
-    int y = static_cast<int>(m_y);
+void NPC::renderSuspicious(SDL_Renderer* renderer, float cameraX, float cameraY) {
+    int x = static_cast<int>(m_x - cameraX);
+    int y = static_cast<int>(m_y - cameraY);
 
     // Body (normal but slightly off-color)
     SDL_SetRenderDrawColor(renderer, 120, 180, 120, 255);

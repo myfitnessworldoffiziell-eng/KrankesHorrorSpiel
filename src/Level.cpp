@@ -77,7 +77,7 @@ void Level::update(float deltaTime, Player* player) {
     }
 }
 
-void Level::render(SDL_Renderer* renderer) {
+void Level::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     // Background
     SDL_SetRenderDrawColor(renderer,
         static_cast<int>(m_backgroundColor[0]),
@@ -89,8 +89,8 @@ void Level::render(SDL_Renderer* renderer) {
     // Background Decorations (rendered before platforms for depth)
     for (const auto& deco : m_decorations) {
         SDL_Rect rect = {
-            static_cast<int>(deco.x),
-            static_cast<int>(deco.y),
+            static_cast<int>(deco.x - cameraX),
+            static_cast<int>(deco.y - cameraY),
             static_cast<int>(deco.width),
             static_cast<int>(deco.height)
         };
@@ -180,8 +180,8 @@ void Level::render(SDL_Renderer* renderer) {
     // Platforms (with material types)
     for (const auto& platform : m_platforms) {
         SDL_Rect rect;
-        rect.x = static_cast<int>(platform.x);
-        rect.y = static_cast<int>(platform.y);
+        rect.x = static_cast<int>(platform.x - cameraX);
+        rect.y = static_cast<int>(platform.y - cameraY);
         rect.w = static_cast<int>(platform.width);
         rect.h = static_cast<int>(platform.height);
 
@@ -227,8 +227,8 @@ void Level::render(SDL_Renderer* renderer) {
     // Goal (exit portal) - only if active
     if (m_goal.active) {
         SDL_Rect goalRect = {
-            static_cast<int>(m_goal.x),
-            static_cast<int>(m_goal.y),
+            static_cast<int>(m_goal.x - cameraX),
+            static_cast<int>(m_goal.y - cameraY),
             static_cast<int>(m_goal.width),
             static_cast<int>(m_goal.height)
         };
@@ -252,8 +252,8 @@ void Level::render(SDL_Renderer* renderer) {
         if (!star.collected) {
             SDL_SetRenderDrawColor(renderer, 255, 220, 0, 255);
 
-            int centerX = static_cast<int>(star.x);
-            int centerY = static_cast<int>(star.y);
+            int centerX = static_cast<int>(star.x - cameraX);
+            int centerY = static_cast<int>(star.y - cameraY);
             int size = 12;
 
             SDL_Point points[5] = {
@@ -275,8 +275,8 @@ void Level::render(SDL_Renderer* renderer) {
         if (!fragment.collected) {
             SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
 
-            int x = static_cast<int>(fragment.x);
-            int y = static_cast<int>(fragment.y);
+            int x = static_cast<int>(fragment.x - cameraX);
+            int y = static_cast<int>(fragment.y - cameraY);
 
             // Glowing cube
             SDL_Rect cubeRect = {x - 8, y - 8, 16, 16};
@@ -291,20 +291,20 @@ void Level::render(SDL_Renderer* renderer) {
     // NPCs
     for (const auto& npc : m_npcs) {
         if (npc) {
-            npc->render(renderer);
+            npc->render(renderer, cameraX, cameraY);
         }
     }
 
     // Enemies
     for (const auto& enemy : m_enemies) {
         if (enemy) {
-            enemy->render(renderer);
+            enemy->render(renderer, cameraX, cameraY);
         }
     }
 
     // Boss (render in front of everything)
     if (m_boss && m_boss->isAlive()) {
-        m_boss->render(renderer);
+        m_boss->render(renderer, cameraX, cameraY);
     }
 }
 

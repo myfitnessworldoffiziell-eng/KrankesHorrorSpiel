@@ -26,7 +26,7 @@ public:
     ~NPC();
 
     void update(float deltaTime);
-    void render(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f);
 
     // Interaction
     bool isPlayerNearby(float playerX, float playerY) const;
@@ -65,8 +65,8 @@ private:
     int m_glitchOffsetX, m_glitchOffsetY;
 
     // Visual
-    void renderFriendly(SDL_Renderer* renderer);
-    void renderCorrupted(SDL_Renderer* renderer);
-    void renderTerminal(SDL_Renderer* renderer);
-    void renderSuspicious(SDL_Renderer* renderer);
+    void renderFriendly(SDL_Renderer* renderer, float cameraX, float cameraY);
+    void renderCorrupted(SDL_Renderer* renderer, float cameraX, float cameraY);
+    void renderTerminal(SDL_Renderer* renderer, float cameraX, float cameraY);
+    void renderSuspicious(SDL_Renderer* renderer, float cameraX, float cameraY);
 };

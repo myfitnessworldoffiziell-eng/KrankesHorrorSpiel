@@ -81,7 +81,7 @@ void GreenSlime::update(float deltaTime) {
     m_squishFactor = 1.0f + 0.1f * std::sin(m_animationTimer);
 }
 
-void GreenSlime::render(SDL_Renderer* renderer) {
+void GreenSlime::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     if (!m_alive) return;
 
     // Body (green blob with squish effect)
@@ -89,8 +89,8 @@ void GreenSlime::render(SDL_Renderer* renderer) {
     int squishHeight = static_cast<int>(m_height / m_squishFactor);
 
     SDL_Rect body = {
-        static_cast<int>(m_x),
-        static_cast<int>(m_y + (m_height - squishHeight)),
+        static_cast<int>(m_x - cameraX),
+        static_cast<int>(m_y - cameraY + (m_height - squishHeight)),
         squishWidth,
         squishHeight
     };
@@ -105,15 +105,15 @@ void GreenSlime::render(SDL_Renderer* renderer) {
 
     // Eyes (two black dots)
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_Rect leftEye = {static_cast<int>(m_x + 8), static_cast<int>(m_y + 10), 4, 4};
-    SDL_Rect rightEye = {static_cast<int>(m_x + 20), static_cast<int>(m_y + 10), 4, 4};
+    SDL_Rect leftEye = {static_cast<int>(m_x - cameraX + 8), static_cast<int>(m_y - cameraY + 10), 4, 4};
+    SDL_Rect rightEye = {static_cast<int>(m_x - cameraX + 20), static_cast<int>(m_y - cameraY + 10), 4, 4};
     SDL_RenderFillRect(renderer, &leftEye);
     SDL_RenderFillRect(renderer, &rightEye);
 
     // Smile (simple line)
     SDL_RenderDrawLine(renderer,
-        static_cast<int>(m_x + 10), static_cast<int>(m_y + 22),
-        static_cast<int>(m_x + 22), static_cast<int>(m_y + 22));
+        static_cast<int>(m_x - cameraX + 10), static_cast<int>(m_y - cameraY + 22),
+        static_cast<int>(m_x - cameraX + 22), static_cast<int>(m_y - cameraY + 22));
 }
 
 // ============================================
@@ -158,14 +158,14 @@ void BlueBird::update(float deltaTime) {
     }
 }
 
-void BlueBird::render(SDL_Renderer* renderer) {
+void BlueBird::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     if (!m_alive) return;
 
     // Body (blue oval)
     SDL_SetRenderDrawColor(renderer, 100, 150, 255, 255);
     SDL_Rect body = {
-        static_cast<int>(m_x),
-        static_cast<int>(m_y),
+        static_cast<int>(m_x - cameraX),
+        static_cast<int>(m_y - cameraY),
         static_cast<int>(m_width),
         static_cast<int>(m_height)
     };
@@ -175,22 +175,22 @@ void BlueBird::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 70, 120, 200, 255);
     if (m_velocityX > 0) {
         // Facing right
-        SDL_RenderDrawLine(renderer, static_cast<int>(m_x), static_cast<int>(m_y + 10),
-                          static_cast<int>(m_x - 8), static_cast<int>(m_y + 16));
+        SDL_RenderDrawLine(renderer, static_cast<int>(m_x - cameraX), static_cast<int>(m_y - cameraY + 10),
+                          static_cast<int>(m_x - cameraX - 8), static_cast<int>(m_y - cameraY + 16));
     } else {
         // Facing left
-        SDL_RenderDrawLine(renderer, static_cast<int>(m_x + 32), static_cast<int>(m_y + 10),
-                          static_cast<int>(m_x + 40), static_cast<int>(m_y + 16));
+        SDL_RenderDrawLine(renderer, static_cast<int>(m_x - cameraX + 32), static_cast<int>(m_y - cameraY + 10),
+                          static_cast<int>(m_x - cameraX + 40), static_cast<int>(m_y - cameraY + 16));
     }
 
     // Eyes
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_Rect eye = {static_cast<int>(m_x + 20), static_cast<int>(m_y + 8), 5, 5};
+    SDL_Rect eye = {static_cast<int>(m_x - cameraX + 20), static_cast<int>(m_y - cameraY + 8), 5, 5};
     SDL_RenderFillRect(renderer, &eye);
 
     // Beak (yellow)
     SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
-    SDL_Rect beak = {static_cast<int>(m_x + 28), static_cast<int>(m_y + 14), 6, 3};
+    SDL_Rect beak = {static_cast<int>(m_x - cameraX + 28), static_cast<int>(m_y - cameraY + 14), 6, 3};
     SDL_RenderFillRect(renderer, &beak);
 }
 
@@ -252,13 +252,13 @@ void GlitchSlime::update(float deltaTime) {
     }
 }
 
-void GlitchSlime::render(SDL_Renderer* renderer) {
+void GlitchSlime::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     if (!m_alive) return;
 
     // Glitchy magenta slime
     SDL_Rect body = {
-        static_cast<int>(m_x + m_offsetX),
-        static_cast<int>(m_y + m_offsetY),
+        static_cast<int>(m_x - cameraX + m_offsetX),
+        static_cast<int>(m_y - cameraY + m_offsetY),
         static_cast<int>(m_width),
         static_cast<int>(m_height)
     };
@@ -278,8 +278,8 @@ void GlitchSlime::render(SDL_Renderer* renderer) {
 
     // Void eyes (black holes)
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_Rect leftEye = {static_cast<int>(m_x + 6), static_cast<int>(m_y + 8), 6, 6};
-    SDL_Rect rightEye = {static_cast<int>(m_x + 20), static_cast<int>(m_y + 8), 6, 6};
+    SDL_Rect leftEye = {static_cast<int>(m_x - cameraX + 6), static_cast<int>(m_y - cameraY + 8), 6, 6};
+    SDL_Rect rightEye = {static_cast<int>(m_x - cameraX + 20), static_cast<int>(m_y - cameraY + 8), 6, 6};
     SDL_RenderFillRect(renderer, &leftEye);
     SDL_RenderFillRect(renderer, &rightEye);
 }
@@ -304,18 +304,18 @@ void SpikeBall::update(float deltaTime) {
     if (m_rotation >= 360.0f) m_rotation -= 360.0f;
 }
 
-void SpikeBall::render(SDL_Renderer* renderer) {
+void SpikeBall::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     // Gray metallic ball
     SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
 
-    int centerX = static_cast<int>(m_x + m_width / 2);
-    int centerY = static_cast<int>(m_y + m_height / 2);
+    int centerX = static_cast<int>(m_x - cameraX + m_width / 2);
+    int centerY = static_cast<int>(m_y - cameraY + m_height / 2);
     int radius = static_cast<int>(m_width / 2);
 
     // Draw circle (approximated)
     SDL_Rect ball = {
-        static_cast<int>(m_x),
-        static_cast<int>(m_y),
+        static_cast<int>(m_x - cameraX),
+        static_cast<int>(m_y - cameraY),
         static_cast<int>(m_width),
         static_cast<int>(m_height)
     };

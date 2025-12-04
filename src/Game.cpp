@@ -34,6 +34,8 @@ Game::Game()
     , m_isFullscreen(false)
     , m_windowPosX(SDL_WINDOWPOS_CENTERED)
     , m_windowPosY(SDL_WINDOWPOS_CENTERED)
+    , m_cameraX(0.0f)
+    , m_cameraY(0.0f)
     , m_lastFrameTime(0)
     , m_gameTime(0.0f)
     , m_totalTime(0.0f)
@@ -482,6 +484,21 @@ void Game::updatePlaying(float deltaTime) {
     // Player Update
     m_player->update(deltaTime);
 
+    // Camera Update - follow player horizontally
+    // Keep player centered, but don't show areas outside the level
+    const float LEVEL_WIDTH = 2400.0f;  // 3x original 800
+    const float WINDOW_WIDTH = 800.0f;
+    const float WINDOW_HEIGHT = 600.0f;
+
+    // Center camera on player horizontally
+    float targetCameraX = m_player->getX() - (WINDOW_WIDTH / 2.0f) + 16.0f;  // 16 = half player width
+
+    // Clamp camera to level bounds
+    m_cameraX = std::max(0.0f, std::min(targetCameraX, LEVEL_WIDTH - WINDOW_WIDTH));
+
+    // Keep camera Y at 0 (no vertical scrolling for now)
+    m_cameraY = 0.0f;
+
     // Level Update (now includes player for boss AI)
     m_level->update(deltaTime, m_player.get());
 
@@ -892,11 +909,11 @@ void Game::renderSettings() {
 }
 
 void Game::renderPlaying() {
-    // Level
-    m_level->render(m_renderer);
+    // Level (with camera offset)
+    m_level->render(m_renderer, m_cameraX, m_cameraY);
 
-    // Player
-    m_player->render(m_renderer);
+    // Player (with camera offset)
+    m_player->render(m_renderer, m_cameraX, m_cameraY);
 
     // === UI OVERLAY ===
 

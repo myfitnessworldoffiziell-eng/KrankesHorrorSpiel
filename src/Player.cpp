@@ -80,11 +80,11 @@ void Player::update(float deltaTime) {
     m_animationTimer += deltaTime;
 }
 
-void Player::render(SDL_Renderer* renderer) {
+void Player::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     // Player rectangle (Cyan for Echo)
     SDL_Rect rect;
-    rect.x = static_cast<int>(m_x);
-    rect.y = static_cast<int>(m_y);
+    rect.x = static_cast<int>(m_x - cameraX);
+    rect.y = static_cast<int>(m_y - cameraY);
     rect.w = static_cast<int>(m_width);
     rect.h = static_cast<int>(m_height);
 

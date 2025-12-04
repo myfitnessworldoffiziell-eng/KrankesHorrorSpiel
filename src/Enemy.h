@@ -23,7 +23,7 @@ public:
     virtual ~Enemy();
 
     virtual void update(float deltaTime) = 0;
-    virtual void render(SDL_Renderer* renderer) = 0;
+    virtual void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) = 0;
 
     // Collision
     SDL_Rect getBounds() const;
@@ -56,7 +56,7 @@ public:
     GreenSlime(float x, float y, AudioManager* audioManager);
 
     void update(float deltaTime) override;
-    void render(SDL_Renderer* renderer) override;
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) override;
 
 private:
     float m_patrolLeft, m_patrolRight;
@@ -76,7 +76,7 @@ public:
     BlueBird(float x, float y, float leftBound, float rightBound, AudioManager* audioManager);
 
     void update(float deltaTime) override;
-    void render(SDL_Renderer* renderer) override;
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) override;
 
 private:
     float m_patrolLeft, m_patrolRight;
@@ -93,7 +93,7 @@ public:
     GlitchSlime(float x, float y, AudioManager* audioManager);
 
     void update(float deltaTime) override;
-    void render(SDL_Renderer* renderer) override;
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) override;
 
 private:
     float m_teleportTimer;
@@ -113,7 +113,7 @@ public:
     SpikeBall(float x, float y, AudioManager* audioManager);
 
     void update(float deltaTime) override;
-    void render(SDL_Renderer* renderer) override;
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) override;
 
 private:
     float m_rotation;

@@ -21,7 +21,7 @@ public:
     ~Level();
 
     void update(float deltaTime, Player* player = nullptr);
-    void render(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f);
 
     // Level management
     void loadLevel(int levelNumber, AudioManager* audioManager);

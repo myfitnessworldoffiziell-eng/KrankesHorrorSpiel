@@ -29,7 +29,7 @@ public:
 
     // Core functions (must be overridden)
     virtual void update(float deltaTime, Player* player) = 0;
-    virtual void render(SDL_Renderer* renderer) = 0;
+    virtual void render(SDL_Renderer* renderer, float cameraX = 0.0f, float cameraY = 0.0f) = 0;
 
     // Boss-specific
     virtual void takeDamage(int damage);

@@ -101,6 +101,10 @@ private:
     int m_windowPosX;
     int m_windowPosY;
 
+    // Camera (for scrolling levels)
+    float m_cameraX;
+    float m_cameraY;
+
     // Core Subsystems
     std::unique_ptr<MetaHorror> m_metaHorror;
     std::unique_ptr<PermissionManager> m_permissionManager;
