@@ -80,6 +80,7 @@ bool Game::initialize() {
         std::cerr << "SDL_mixer konnte nicht initialisiert werden: " << Mix_GetError() << std::endl;
         return false;
     }
+    std::cout << "✓ SDL_mixer initialized: 44100 Hz, 2 channels, 2048 buffer" << std::endl;
 
     // SDL_ttf initialisieren
     if (TTF_Init() == -1) {
