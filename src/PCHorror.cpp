@@ -93,7 +93,7 @@ void PCHorror::triggerEffect(PCHorrorType type, float duration, float intensity)
                 "All personal files will be locked in",
                 "Pay 0.5 BTC to recover your data"
             };
-            if (m_audioManager) m_audioManager->playSound("scare_audio", 100);
+            if (m_audioManager) m_audioManager->playSound("glitch", 100);
             break;
 
         case PCHorrorType::FAKE_VIRUS_DETECTED:

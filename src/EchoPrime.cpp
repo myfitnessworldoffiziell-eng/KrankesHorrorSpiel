@@ -236,7 +236,7 @@ void EchoPrime::transitionToPhase(BossPhase newPhase) {
         case BossPhase::PHASE_2:
             m_currentDialogue = "You're hurting me... Why?";
             if (m_audioManager) {
-                m_audioManager->playSound("scare_audio", 100);
+                m_audioManager->playSound("glitch", 100);
             }
             break;
         case BossPhase::PHASE_3:

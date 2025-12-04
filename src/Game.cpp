@@ -152,21 +152,26 @@ bool Game::initialize() {
     m_audioManager->loadMusic("horror_ambient", "assets/audio/horror_ambient.mp3");
 
     // SFX - Gameplay (6 sounds)
-    m_audioManager->loadSound("jump", "assets/audio/jump.wav");
-    m_audioManager->loadSound("collect", "assets/audio/collect.wav");
-    m_audioManager->loadSound("death", "assets/audio/death.wav");
-    m_audioManager->loadSound("hit", "assets/audio/hit.wav");
-    m_audioManager->loadSound("chirp", "assets/audio/chirp.wav");
-    m_audioManager->loadSound("zap", "assets/audio/zap.wav");
+    m_audioManager->loadSound("jump", "assets/audio/jump.mp3");
+    m_audioManager->loadSound("collect", "assets/audio/collect.mp3");
+    m_audioManager->loadSound("death", "assets/audio/death.mp3");
+    m_audioManager->loadSound("hit", "assets/audio/hit.mp3");
+    m_audioManager->loadSound("chirp", "assets/audio/chirp.mp3");
+    m_audioManager->loadSound("zap", "assets/audio/zap.mp3");
 
-    // Horror SFX (5 sounds)
-    m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.wav");
-    m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.wav");
-    m_audioManager->loadSound("scare_appear", "assets/audio/scare_appear.wav");
-    m_audioManager->loadSound("scare_audio", "assets/audio/scare_audio.wav");
-    m_audioManager->loadSound("glitch", "assets/audio/glitch.wav");  // 👻 Procedurally generated glitch!
+    // Horror SFX (4 sounds)
+    m_audioManager->loadSound("jumpscare", "assets/audio/jumpscare.mp3");
+    m_audioManager->loadSound("whitenoise", "assets/audio/whitenoise.mp3");
+    m_audioManager->loadSound("scare_appear", "assets/audio/scare_appear.mp3");
+    // m_audioManager->loadSound("scare_audio", "assets/audio/scare_audio.mp3");  // TODO: Missing file
+    m_audioManager->loadSound("glitch", "assets/audio/glitch.mp3");
 
-    std::cout << "✓ Loaded 15 audio files (4 music + 11 SFX)" << std::endl;
+    std::cout << "✓ Loaded 14 audio files (4 music + 10 SFX)" << std::endl;
+
+    // Set volume levels for proper audio mixing
+    m_audioManager->setMusicVolume(48);   // ~37% - Background music should be subtle
+    m_audioManager->setSFXVolume(96);     // ~75% - SFX should be clear and audible
+    std::cout << "✓ Audio volumes configured (Music: 48/128, SFX: 96/128)" << std::endl;
 
     m_isRunning = true;
     m_lastFrameTime = SDL_GetTicks();
@@ -175,7 +180,7 @@ bool Game::initialize() {
     std::cout << "  Initialization complete!" << std::endl;
     std::cout << "========================================" << std::endl;
 
-    // Start menu music
+    // Start menu music (loops infinitely by default)
     m_audioManager->playMusic("menu");
 
     return true;
@@ -1347,7 +1352,7 @@ void Game::advanceToNextLevel() {
             m_dialogSystem->addDialog("", "I'm with you. Forever.", 0.0f);
 
             // Play horror sound
-            m_audioManager->playSound("scare_audio", 100);
+            m_audioManager->playSound("glitch", 100);  // Using glitch sound (scare_audio missing)
         } else {
             // ENDING A: The Cycle Continues (Normal ending)
             std::cout << "[Game] ENDING A: The Cycle Continues" << std::endl;

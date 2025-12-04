@@ -83,7 +83,7 @@ void BossDefeatHorror::update(float deltaTime) {
     else if (m_currentPhase == 3 && m_timer > 11.0f) {
         m_currentPhase = 4;
         if (m_audioManager) {
-            m_audioManager->playSound("scare_audio", 100);
+            m_audioManager->playSound("glitch", 100);
         }
     }
     else if (m_currentPhase == 4 && m_timer > 14.0f) {
