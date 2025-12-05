@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "AudioManager.h"
 #include <algorithm>
+#include <cmath>
 
 Level::Level()
     : m_levelNumber(0)
@@ -193,7 +194,7 @@ void Level::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     static float particleDrift = 0.0f;
     particleDrift += 0.8f;
     for (int i = 0; i < 40; ++i) {
-        float particleX = (i * 67.0f + particleDrift) % 2400.0f;
+        float particleX = fmod(i * 67.0f + particleDrift, 2400.0f);
         float particleY = (i * 43.0f + sin(particleDrift * 0.05f + i) * 50.0f);
         if (particleY < 0) particleY += 600.0f;
         if (particleY > 600) particleY -= 600.0f;

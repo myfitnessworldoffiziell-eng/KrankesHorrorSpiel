@@ -103,7 +103,7 @@ void Player::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     SDL_Rect bodyLayer2 = {rect.x + 4, rect.y + 4, rect.w - 8, rect.h - 8};
 
     // Outer glow (animated)
-    int glowPulse = static_cast<int>(m_animTimer * 3.0f) % 2;
+    int glowPulse = static_cast<int>(m_animationTimer * 3.0f) % 2;
     if (glowPulse == 0) {
         SDL_SetRenderDrawColor(renderer, 0, 200, 255, 100);
         SDL_Rect glow = {rect.x - 2, rect.y - 2, rect.w + 4, rect.h + 4};
@@ -130,7 +130,7 @@ void Player::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     SDL_RenderDrawPoint(renderer, rect.x + rect.w - 2, rect.y + rect.h - 2);
 
     // Animated eyes with glow
-    int eyeAnim = static_cast<int>(m_animTimer * 10.0f) % 20;
+    int eyeAnim = static_cast<int>(m_animationTimer * 10.0f) % 20;
     bool eyeBlink = (eyeAnim == 0);
 
     if (!eyeBlink) {
@@ -173,7 +173,7 @@ void Player::render(SDL_Renderer* renderer, float cameraX, float cameraY) {
     // Digital particles around player (moving effect)
     SDL_SetRenderDrawColor(renderer, 0, 255, 255, 150);
     for (int i = 0; i < 3; ++i) {
-        int particleOffset = static_cast<int>(m_animTimer * 5.0f + i * 2.0f) % 8;
+        int particleOffset = static_cast<int>(m_animationTimer * 5.0f + i * 2.0f) % 8;
         SDL_RenderDrawPoint(renderer, rect.x - 4 + particleOffset, rect.y + 5 + i * 10);
         SDL_RenderDrawPoint(renderer, rect.x + rect.w + 4 - particleOffset, rect.y + 8 + i * 8);
     }
